@@ -1,0 +1,87 @@
+<!-- Fecha: 28 de octubre del 2022 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de eventos</title>
+    <style>
+        .caja {
+            width: 10em;
+            height: 10em;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid maroon;
+            font-family: sans-serif;
+            font-size: 1.5rem;
+        }
+
+        .caja-1 {
+            background-color: chocolate;
+            color: maroon;
+        }
+        
+        .caja-2 {
+            background-color: burlywood;
+        }
+
+        .caja-3 {
+            background-color: goldenrod;
+        }
+
+        .contenidos {
+            margin-top: .5em;
+            padding: 2em;
+            background-color: teal;
+        }
+
+        .caja-4 {
+            background-color: olivedrab;
+            color: ghostwhite
+        }
+
+        button {
+            padding: 0.5em 1em;
+        }
+
+        .caja-5 {
+            display: block;
+            padding: 1em;
+            margin-top: 0.5em;
+
+            background-color: violet;
+        }
+
+        .caja-6 {
+            background-color: indigo;
+            color: hsl(0, 100%, 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="caja caja-1"><p>Caja 1</p></div>
+    <div class="caja caja-2"><p>Caja 2</p></div>
+    <div class="caja caja-3"><p>Caja 3</p></div>
+
+    <section class="contenidos">
+        <div class="caja caja-4"><button>Boton</button></div>
+    </section>
+    
+    <section class="contenidos noticias">
+        <div class="caja caja-5">
+            <p>Caja 5</p>
+            <button class="enviar">Enviar</button>
+        </div>
+    </section>
+    <section class="contenidos avisos">
+        <div class="caja caja-6">
+            <p>Caja 6</p>
+            <button>Leer</button>
+        </div>
+    </section>
+
+    <script src="./captura.js"></script>
+</body>
+</html>
