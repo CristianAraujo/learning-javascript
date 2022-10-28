@@ -1,0 +1,84 @@
+<!-- Fecha: 28 de octubre del 2022 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delegación de eventos</title>
+    <style>
+        table, td{
+            border: 1px solid indianred;
+            border-collapse: collapse;
+        }
+
+        td {
+            height: 6em;
+            width: 6em;
+            padding: 0.5em;
+            text-align: center;
+            background-color: rebeccapurple;
+            color: hsl(0, 100%, 100%);
+            font-size: 18px;
+            font-family: sans-serif;
+        }
+
+        .seleccionado {
+            background-color: indianred;
+            color: indigo
+        }
+
+        .menu {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            gap: 1px;
+        }
+
+        .menu__item {
+            padding: 0.5em 1em;
+            background-color: darkred;
+            color: floralwhite;
+            font-family: sans-serif;
+        }   
+
+        .menu__item:hover {
+            background-color: darkmagenta;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <table class="paises">
+        <tr>
+            <td>Thailand</td>
+            <td>Phillipines</td>
+            <td>Malasya</td>
+        </tr>
+        <tr>
+            <td>Singapour</td>
+            <td>Indonesia</td>
+            <td>Taiwan</td>
+        </tr>
+        <tr>
+            <td>Singapour</td>
+            <td>Indonesia</td>
+            <td>Taiwan</td>
+        </tr>
+        <tr>
+            <td>Polinia</td>
+            <td>Bulgaria</td>
+            <td>Ukrania</td>
+        </tr>
+    </table>
+    <menu class="menu">
+        <li class="menu__item menu__item--1"data-action="save">Guardar</li>
+        <li class="menu__item menu__item--2"data-action="load">Cargar</li>
+        <li class="menu__item menu__item--3"data-action="search">Buscar<li>
+        <li class="menu__item menu__item--4"data-action="send">Enviar</li>
+    </menu>
+        
+    <script src="./delegacion.js"></script>
+</body>
+</html>
