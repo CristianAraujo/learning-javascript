@@ -1,0 +1,36 @@
+<!-- Fecha: 28 de octubre del 2022 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos</title>
+    <style>
+        .caja {
+            height: 15em;
+            width: 15em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid maroon;
+            background-color: blanchedalmond;
+        }
+    </style>
+</head>
+<body>
+    <!-- Manejo de eventos como atributo HTML -->
+    <p class="click" id="clickear" onclick="alert('Click');">Parrafo on click</p>
+    
+    <!-- Manejo de eventos como atributo llamando a una función -->
+    <p class="click" id="saludo" onclick="saludo()">Parrafo on click</p>
+    
+    <!-- Manejo de eventos como propiedad del DOM -->
+    <p class="click" id="saludar">Parrafo DOM</p>
+
+    <!-- Agregar un listener -->
+    <div class="caja">Caja</div>
+    
+    <script src="./introduction.js"></script>
+</body>
+</html>
