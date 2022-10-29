@@ -83,5 +83,51 @@ let menu = document.querySelector('.menu')
 new Menu(menu);
 
 /*
+    Patrón de comportamiento
+
+    Podemos también usar la delegación de eventos para añadir comportamientos a los elementos
+    de manera declarativa.
+
+    - Podemos añadir un atributo personalizado al elemento que describa su comportamiento
+    - 
+
+    Ejemplo Behavior: counter
 
 */
+
+document.addEventListener('click', function (e) {
+    if (e.target.dataset.counter != undefined) {
+        e.target.value++
+    }
+});
+
+/*
+    Ejemplo comportamiento: toggle
+    Otro ejemplo de comportamiento es hacer click en un elemento con un atributo data-toggle-id
+    el cual mostrará y oculatará el elemento con una id dada.
+*/
+
+// Al agregar el listener al documento, este escucha cualquier evento click
+// que surga en el documento
+document.addEventListener('click', function(e) {
+
+    // Cuando ocurre un evento click, se debe reconocer de donde viene para
+    // procesarlo de la manera en que deseamos. En este caso buscamos que el
+    // click se produzca en un elmemento que tenga el atributo data-toggle-id
+    // si eso sucede, entonces se consulta el valor del atributo, el cual se
+    // guarda como valor de una ID para el elemento a buscar en el DOM.
+    let id = e.target.dataset.toggleId;
+
+    // Si el click no ocurrió en ningún elemento que tenga el atrbuto toggleId
+    // entonces retornamos
+    if(!id) return;
+
+    // Si encontramos un elemento que tiene el atributo que nos interesa, entonces
+    // seleccionamos el elemento que tenga como ID el valor del atribudo data-toggle-id
+    // del elemento donde ocurrió el evento click.
+    let elem = document.getElementById(id);
+
+    // Finalmente cambiamos el valor del atributo hidden del elemento seleccionado, de 
+    // manera que podemos hacer un toggle de este.
+    elem.hidden = !elem.hidden;
+});
