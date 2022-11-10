@@ -233,7 +233,8 @@ En el ejemplo anterior, las funciones tienen un comportamiento asíncrono. En el
 
 En la función `hacerResta` se recibe como parámetro una la función `resta` que se usa como callback. La función `setTimeout` recibe como primer parámetro el callback, como segundo parámetro el tiempo de retardo cuando se ejecute este callback y a partir del tercer argumento recibe los argumentos que se serán usados por el callback.
 
-> Para ver ejemplos del uso de Callbacks ver el archivo [callbacks](callbacks.js)
-
 ## Promesas
 
+> Para ver ejemplos del funcionamiento de las promesas ver este archivo [Promesas](promesas.js)
+
+Una promesa en un objeto que representa el resultado de una operación asíncrona.

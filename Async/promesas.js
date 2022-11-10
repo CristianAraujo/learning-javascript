@@ -1,3 +1,0 @@
-let promesa = new Promise(
-    
-);
