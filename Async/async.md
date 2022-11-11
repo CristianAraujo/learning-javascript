@@ -237,4 +237,162 @@ En la función `hacerResta` se recibe como parámetro una la función `resta` qu
 
 > Para ver ejemplos del funcionamiento de las promesas ver este archivo [Promesas](promesas.js)
 
-Una promesa en un objeto que representa el resultado de una operación asíncrona.
+**¿Qué son las promesas?**  
+Una promesa en un objeto que representa el resultado de una operación asíncrona. Puede crearse mediante su constructor, como se mmuestra en el siguiente ejemplo.
+
+```js
+let promesa = new Promise(function(resolve, rejected) {
+  // Códido de la función ejectura.
+});
+```
+
+**Función ejecutora y sus parámetros**  
+El constructor de una promesa recive como argumento una función la cual es llamada función ejectura (executor), y es la que se encarga de definir las tareas que deben ser realizadas por la promesa, el constructor de una promesa llama imediatamente a esta función al crear la promesa. Esta función a su vez recibe dos callbacks como argumentos, `resolve` y `rejected`. Si la promesa es procesada con éxito, se llamará automáticamente a `resolve` mientras que si la promesa devuelve un error, se llamará a `rejected`. Estos callbacks son creados automáticamente por JavaScript, por lo cual nosotros solo nos limitaremos a hacer uso de ellos, y son llamados por la función ejecutora cuando se obtiene un resultado.
+
+```js
+let promesa = new Promise(function(resolve, rejected){
+  // Código de la función ejecutora.
+
+  if (succes) {
+    // Si la promesa se resuelve correctamente, llamamos a resolve
+    resolve('resultado exitoso');
+  } else {
+    // Si la primesa se resuelve con errores, se llama a rejected
+    rejected('resultado con error');
+  }
+});
+```
+
+**Estados de una promesa**  
+Una promesa al ser un objeto, contiene un estado, cuyas propiedades internas varian dependiendo del resultado obtenido, al procesar la promesa y dependiendo si esta ha sido procesada o no. Inicialmente, una promesa se encuentra con `state: pending` y con `result: undefined` lo que indica que la promesa esta pendiente de procesar y que el valor del retorno aun no se obtiene por lo cual se cuenta indefinido.
+
+Cuando una promesa es procesada, si esta se procesa con exito, el estado de la promesa cambiará siendo su nuevo estado: `state: fullfiled` y `result: value`. Y se llamará al callback resolve. En cambio si una promesa se procesa sin éxito, su estado será `state: rejected` y `result: error`.
+
+![Estado de promesas](https://javascript.info/article/promise-basics/promise-resolve-reject.svg)
+
+Una promesa ya procesada que toma un valor `fullfiled` no puede cambiar y tomar un valor `rejected` ni vise versa.
+
+Las promesas solo pueden tener un resultado, por lo que si llamamos a más de un callback que resuelve el estado de la promesa, entonces las llamadas posteriores a la primera serán ignoradas.
+
+```js
+let promesa = new Promise((resolve, rejected) => {
+  resolve('Primer llamado a resuelto');
+  resolve('Segundo llamado a resuelto');
+});
+```
+
+En el ejemplo anterior, el segundo llamado a `resolve` sería ignorado.
+
+**Manejo de rejected**  
+El callback `rejected` puede devolver cualquier tipo de dato al igual que resolve, pero al tratarse de un error, es recomendable que devuelva un objeto de tipo error, de modo que podamos recibir una información detallada del por qué nuestra promesa no logró resolverse de manera exitosa.
+
+```js
+let promesa = new Promise ((resolve, rejected) => {
+  if(exito){
+    resolve('Resultado exitoso');
+  } else {
+    rejected(new Error('Ocurrió un error'));
+  }
+});
+```
+
+### Consumir una promesa
+
+Las propiedades del estado del objeto de una promesa son internas, por lo que no podemos acceder directamente, para ello, debemos hacer uso de los métodos `then`, `catch` y `finally`.
+
+**El método `then`**  
+
+Para obtener el valor de una promesa cuando su estado se encuentra resuelta usamos el método `then` sobre el objeto de la promesa. Este método recibe dos functiones como callbacks, `onFullfiled` y `onRejected`, la primera será llamada si la promesa se resuelve correctmente y se recibe un valor, mientras que la segunda será llamada si la promesa es rechazada.
+
+```JS
+// Usamosos el método then de las promesas, el cual recibe las 
+// funciones que maneja que manejarán las respuestas, estas se 
+// llamarán automáticamente y en el orden que se ha indicado. 
+promise.then(onFullfiled, onRejected);
+
+function onFullfiled (resolve) {
+  // código para manejar la función
+}
+```
+
+También podemos crear los callbacks dentro del método `then()`, como se ve en el siguiente ejemplo.
+
+```JS
+promise.then(
+  result => { /* codigo que trate el caso fullfiled */ },
+  error => { /* código que trate el caso rejected */ }
+);
+```
+También podríamos encadenas el método then a la creación de la promesa
+
+```JS
+Promise((resolve, rejected) => {
+  if(exito){
+    resolve('Mensaje de exito');
+  } else {
+    rejected('Mensaje de rechazo');
+  }
+}).then(
+  resolve => { /* Manejar un fullfiled */ }
+  error => { /* Manejar un error */ }
+)
+```
+
+Si deseamos solo capturar un error, o solo capturar una resolución exitosa podemos dejar uno de los parámetros como null en el método `then()` y pasarle solo la función que capture el tipo de resolución que deseamos. Debemos tener en cuenta que los parámetros el método `then()` son opcionales.
+
+```JS
+promesa.then(null, manejoError);
+
+function manejoError (error) {
+  // Código para manejo del error
+}
+
+// Para solo manejar resultados exitosos, pasamos un solo 
+// parámetro
+prom.then(manejoExito);
+
+funcition manejoExito(exito) {
+  // Código para manejo del resultado exitoso
+}
+```
+
+**El método `catch`**  
+
+El método `catch` nos permite capturar el estado una promesa cuyo resultado fue erróneo. Es equivalente a dejar nulo el primer parámetro de la función `then()`.
+
+```JS
+promesa.catch(
+  error => { /* Código del error */ }
+)
+```
+
+**Método `finally`**  
+
+El método `finally()` se ejecutará siempre independientemente del resultado de la resolución de la promesa, por lo que es útil para realizar con el tareas de limpieza, como cerrar una conexión a una base de datos.
+
+`Finally` no recibe argumentos, es similar a llamar al método `then(null, null)`. Cuando llamamos el método finally, podemos posterior a su llamado llamar tanto al método then() como al método catch() ya que finally no interrumpe el manejo del resultado de las promesas y el objeto de la promesa *pasa a traves* de finally hasta su manejador correspondiente. En el caso de que ocurra un error.
+
+```JS
+promise.finally(
+  console.log('Conexión cerrada');
+);
+
+let resultado = new Promise((succes, error) => {
+  if (exito) {
+    succes('Exito');
+  } else {
+    error('error');
+  }
+});
+
+resultado.finally(
+  console.log('Termino de carga');
+)
+.then(
+  exito => console.log('Carga exitosa');
+  error => console.log('Error al realizar la carga');
+)
+```
+
+También debemos tener en cuenta que el método `finally()` no debe retornar nada y si lo hace esto será ignorado.
+
