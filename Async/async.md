@@ -238,7 +238,12 @@ En la función `hacerResta` se recibe como parámetro una la función `resta` qu
 > Para ver ejemplos del funcionamiento de las promesas ver este archivo [Promesas](promesas.js)
 
 **¿Qué son las promesas?**  
-Una promesa en un objeto que representa el resultado de una operación asíncrona. Puede crearse mediante su constructor, como se mmuestra en el siguiente ejemplo.
+Una promesa en un objeto que representa el resultado de una operación asíncrona. Pero en realidad tenemos dos maneras de ver las promesas:
+
+- Como un contenedor de un resultado que será entregado posteriormente. Imaginemos una caja vacía, que espera que guardemos algo dentro.
+- También podemos ver las promesas como un objeto donde podemos regitrar listener. En la misma caja vacia, podemos poner instrucciones de que se hará cuando se reciva el objeto.
+
+Puede crearse mediante su constructor, como se mmuestra en el siguiente ejemplo.
 
 ```js
 let promesa = new Promise(function(resolve, rejected) {
@@ -323,6 +328,7 @@ promise.then(
   error => { /* código que trate el caso rejected */ }
 );
 ```
+
 También podríamos encadenas el método then a la creación de la promesa
 
 ```JS
@@ -395,4 +401,6 @@ resultado.finally(
 ```
 
 También debemos tener en cuenta que el método `finally()` no debe retornar nada y si lo hace esto será ignorado.
+
+### Encadenamiento de promesas
 
