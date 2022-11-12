@@ -271,11 +271,15 @@ let promesa = new Promise(function(resolve, rejected){
 **Estados de una promesa**  
 Una promesa al ser un objeto, contiene un estado, cuyas propiedades internas varian dependiendo del resultado obtenido, al procesar la promesa y dependiendo si esta ha sido procesada o no. Inicialmente, una promesa se encuentra con `state: pending` y con `result: undefined` lo que indica que la promesa esta pendiente de procesar y que el valor del retorno aun no se obtiene por lo cual se cuenta indefinido.
 
-Cuando una promesa es procesada, si esta se procesa con exito, el estado de la promesa cambiará siendo su nuevo estado: `state: fullfiled` y `result: value`. Y se llamará al callback resolve. En cambio si una promesa se procesa sin éxito, su estado será `state: rejected` y `result: error`.
+Cuando una promesa es procesada, si esta se procesa con exito, el estado de la promesa cambiará siendo su nuevo estado: `state: fulfilled` y `result: value`. Y se llamará al callback resolve. En cambio si una promesa se procesa sin éxito, su estado será `state: rejected` y `result: error`.
 
 ![Estado de promesas](https://javascript.info/article/promise-basics/promise-resolve-reject.svg)
 
-Una promesa ya procesada que toma un valor `fullfiled` no puede cambiar y tomar un valor `rejected` ni vise versa.
+Una promesa ya procesada que toma un valor `fulfilled` no puede cambiar y tomar un valor `rejected` ni vise versa.  
+
+Cuando una promesa pasa de estar de tener un estado pendiente a un estado resuelto con un valor, ya sera `rejected` o `fulfilled`, se dice que la promesa se encuentra `seattled`.
+
+![Estado de una promesa](https://exploringjs.com/impatient-js/img-book/promises/promise_states_simple.svg)
 
 Las promesas solo pueden tener un resultado, por lo que si llamamos a más de un callback que resuelve el estado de la promesa, entonces las llamadas posteriores a la primera serán ignoradas.
 
@@ -287,6 +291,23 @@ let promesa = new Promise((resolve, rejected) => {
 ```
 
 En el ejemplo anterior, el segundo llamado a `resolve` sería ignorado.
+
+**Crear una promesa con un estado definido**  
+Podemos crear una promesa que ya tenga un estado definido mediante el uso de los métodos estáticos de la clase `Promise` con `Promise.resolve(value)` y `Promise.rejected(value)`. `Promise.resolve(value)` devuelte una promesa que se encuentra con un estado `fulfilled` y con un `result` cuyo valor será el valor del argumento.  
+
+Mientras, `Promise.rejected(value)`, devuelve una promesa con un estado rejected y con `result` cuyo error será el que recibe en su argumento.
+
+```js
+let resuelta = Promise.resolve('Correcto');
+resuelta.then(
+  console.log('Promesa resuelta');
+);
+
+let rechazada = Promise.rejected(new Error('Error'));
+rechazada.catch(
+  err => console.log(`Ha sucedido un error: ${err}`);
+);
+```
 
 **Manejo de rejected**  
 El callback `rejected` puede devolver cualquier tipo de dato al igual que resolve, pero al tratarse de un error, es recomendable que devuelva un objeto de tipo error, de modo que podamos recibir una información detallada del por qué nuestra promesa no logró resolverse de manera exitosa.
@@ -307,15 +328,15 @@ Las propiedades del estado del objeto de una promesa son internas, por lo que no
 
 **El método `then`**  
 
-Para obtener el valor de una promesa cuando su estado se encuentra resuelta usamos el método `then` sobre el objeto de la promesa. Este método recibe dos functiones como callbacks, `onFullfiled` y `onRejected`, la primera será llamada si la promesa se resuelve correctmente y se recibe un valor, mientras que la segunda será llamada si la promesa es rechazada.
+Para obtener el valor de una promesa cuando su estado se encuentra resuelta usamos el método `then` sobre el objeto de la promesa. Este método recibe dos functiones como callbacks, `onfulfilled` y `onRejected`, la primera será llamada si la promesa se resuelve correctmente y se recibe un valor, mientras que la segunda será llamada si la promesa es rechazada.
 
 ```JS
 // Usamosos el método then de las promesas, el cual recibe las 
 // funciones que maneja que manejarán las respuestas, estas se 
 // llamarán automáticamente y en el orden que se ha indicado. 
-promise.then(onFullfiled, onRejected);
+promise.then(onfulfilled, onRejected);
 
-function onFullfiled (resolve) {
+function onfulfilled (resolve) {
   // código para manejar la función
 }
 ```
@@ -324,7 +345,7 @@ También podemos crear los callbacks dentro del método `then()`, como se ve en 
 
 ```JS
 promise.then(
-  result => { /* codigo que trate el caso fullfiled */ },
+  result => { /* codigo que trate el caso fulfilled */ },
   error => { /* código que trate el caso rejected */ }
 );
 ```
@@ -339,7 +360,7 @@ Promise((resolve, rejected) => {
     rejected('Mensaje de rechazo');
   }
 }).then(
-  resolve => { /* Manejar un fullfiled */ }
+  resolve => { /* Manejar un fulfilled */ }
   error => { /* Manejar un error */ }
 )
 ```
@@ -362,7 +383,7 @@ funcition manejoExito(exito) {
 }
 ```
 
-**El método `catch`**  
+**El método `catch` y manejo de errores**  
 
 El método `catch` nos permite capturar el estado una promesa cuyo resultado fue erróneo. Es equivalente a dejar nulo el primer parámetro de la función `then()`.
 
@@ -370,6 +391,62 @@ El método `catch` nos permite capturar el estado una promesa cuyo resultado fue
 promesa.catch(
   error => { /* Código del error */ }
 )
+```
+
+Es importante tener en cuenta que **no debemos mezclas rejections asíncronas y errores asíncronos**, de este modo solo debemos enforcarnos en un único mecanismo de manejo de errores. Por lo que, todas nuestras funciones y métodos basados en promesas, no deberían retornar excepciones.
+
+```js
+function asynOp(){
+  consultarDbAsyn();
+  return consultarDbAsyn()
+    .then(result => {
+      // Código que prosesa resultado
+    });  
+}
+```
+
+En el ejemplo anterior, la función `consultarDBAsync()` podria retornar una excepción, pero no estamos preparados para manejar una excepción, ya que esta deberia manejarse con un bloque `try..catch`, en este caso una exepción no estaría encasulada en un objeto tipo `Promise` por lo que no la podríamos manejar con los métodos `then()` ni `catch()`.
+
+Para solucionar lo anterior, podemos optar por alguna de las siguientes soluciones: envolver el cuerpo de la función en un bloque `try..catch` y retornar una promesa rejected si ocurre una excepcion.
+
+```js
+function hacerAsync(){
+  try {
+    hacerAlgoAsync();
+    return hacerAlgoAsync().then(
+      result => { /*.. */ } 
+    );
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+```
+
+En el ejemplo anterior, estaremos siempre retornando una promesa, por lo que permitiremos el manejo de errores con los métodos del objeto `Promise`. La segunda opción es dejar que el mmétodo `then()` convierta la exepción en una promesa rejected, para esto, llamamos a la función que posiblemente nos entregue una excepción dentro del método `then()` luego de comenzar un encadenamiento con la creación de una promesa.
+
+```js
+function hacerAsync(){
+  return Promise.resolve().then(() => {
+      hacerAlgoAsync();
+      return hacerAlgoAsync();    
+    }
+  ).then(result => {
+    //
+  });
+}
+```
+
+En el ejemplo anterior, se encapsula la llamada a la función que puede devolver una excepción dentro del método `then()` y este es quién se encarga de devolver una promesa siempre. La tercera opción es usar el constructor `new Promise`, el cual también siempre nos devuelve una promesa.
+
+```js
+function hacerAsync(){
+  return new Promise((resolve, rejected) => {
+    hacerAlgoAsync();
+    resolve(hacerAlgoAsync());
+  }).then(result => {
+    // Manejar promesa devuelta
+  });
+}
 ```
 
 **Método `finally`**  
@@ -403,4 +480,20 @@ resultado.finally(
 También debemos tener en cuenta que el método `finally()` no debe retornar nada y si lo hace esto será ignorado.
 
 ### Encadenamiento de promesas
+
+Los métodos `then()` y `catch()` siempre retornan una promesa, lo que nos permite crear un encadenamiento de llamadas, pasando las promesas retornadas al siguiente manejador.
+
+```js
+function obtenerDatos(num) {
+  return new Promise((resolve, rejected) => {
+    resolve(num * 1);
+  });
+}
+
+obtenerDatos(2)
+  .then( result => return result * 2; );
+  .then( result => return result * 4; );
+  .catch( error => console.log('Ha ocurrido un error'));
+```
+
 
