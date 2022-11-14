@@ -496,4 +496,18 @@ obtenerDatos(2)
   .catch( error => console.log('Ha ocurrido un error'));
 ```
 
+### Funciones combinandoras. API de promesas
 
+Hay 6 métodos estáticos en la clase `Promise` que nos permiten manejar varias promesas a la vez. De cuales los métodos primitivos son los ya vistos: `Promise.resolve()` y `Promise.rejected()`. Los métodos combinadores son `Promise.all()`, `Promise.any()`, `Promise.race()` y `Promise.allSettled()`. Estos últimosos son los que veremos a continuaciación y tienen las siguientes particularidades:
+
+- Su input debe ser un iterable con zero o más promesas.
+- Su outup es una sola promesa.
+
+**El método `Promise.all()`**  
+Este método toma un iterable, usualmente una array de promesas, y retorna una promesa que contiene uno de los dos siguientes estados:
+
+- `Fulfilled` si todas las promesas del array se encuentran `Fulfilled`. Su valor será un array con todos los valores `fulfilled` de las promesas del array recibido.
+- `Rejected` si al menos una de las promesas que contine el array se encuentra `rejected`. Su valor será el valor `rejected` de las promesas que se encuentren en estado `rejected`.
+
+> *¿En el caso que más de una promesa en el array se encuentre rejected, solo se devuelve el valor rejected de una sola promesa, o se devuelve una array con todos los valores rejected?*  
+> *¿Se espera a que todas las promesas estén seattled?*
