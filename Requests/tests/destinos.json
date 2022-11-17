@@ -1,0 +1,27 @@
+{
+    "Thailand" : {
+        "cities" : ["Bangkok", "Chiang Mai", "Pattaya"],
+        "time" : "8 months"
+    },
+    
+    "Phillipines" : {
+        "cities" : ["Manila", "Cebu", "Davao"],
+        "time" : "8 months"
+    },
+
+    "Indonesia" : {
+        "cities" : ["Jakarta", "Bali"],
+        "time" : "3 months"
+    },
+
+    "Malasia" : {
+        "cities": ["Kuala Lumpur"],
+        "time" :"3 months"
+    },
+
+    "Vitnam" : {
+        "cities" : ["Hanoi", "Ho Chi Minh"],
+        "time" :"4 months"
+    }
+}
+
