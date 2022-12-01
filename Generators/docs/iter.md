@@ -1,6 +1,6 @@
 # Iterables, iteradores y generadores
 
-La iteración es la ejecución de una porción de código repetidamente en el tiempo. Para esto, en JavaScript, se debe implementar el `protocolo iterator` el cual conecta dos grupos de entidades en JavaScript:
+La iteración es la ejecución de una porción de código repetidamente en el tiempo. Para esto, en JavaScript, se debe implementar el `protocolo iterator`. Un protocolo, son reglas de implementación más una interfaz que las usa. En este caso, el `protocolo iterator` conecta dos grupos de entidades en JavaScript:
 
 - Fuentes de datos: diferentes estructuras de datos como: arrays, maps, sets, etc.
 - Consumidores de datos: Algoritmos que necesitan acceder a los valores en las estructuras de datos de manera secuencial. Como por ejemplo un bucle for..of.
@@ -13,7 +13,11 @@ Por lo que la iteración funciona debido a que las fuentes de datos implementan 
 
 ## Roles en la iteración
 
-La iteración realmente se forma por tres componentes, tres interfaces distintas que hacen la hacen posible.
+La iteración realmente se forma por tres componentes, tres interfaces distintas que hacen la hacen posible. El `objeto iterable`, el `iterator` y el `iteratorResult`. Sin embargo solo los dos primeros forman el núcleo de la iteración.
+
+![Núcleo de la iteración](https://exploringjs.com/impatient-js/img-book/sync-iteration/iteration-protocol.svg)
+
+El objeto iterable, siempre implementa el método `[Symbol.iterator]()`, que devuelve un `iterator`, el cual contiene el método `next()`.
 
 **El objeto iterable**  
 Un `objeto iterable` tiene la capacidad de permitirnos recorrer sus valores de manera secuencial. Es aquella estructura de datos que implementa el `protocolo iterable`. Dicho protocolo se basa en la implementación del método iterator o `[Symbol.iterator]` el cual debe devolver un objeto de tipo `iterator` (se definirá posteriormente).
@@ -24,12 +28,18 @@ let range = {
     to: 10,
 
     [Symbol.iterator]() {
-        
+        this.current = this.from;
+        return this;
     },
 
-    
+    next() {
+        if (this.current <= this.to) {
+            return {done: false, value.current++};
+        } else {
+            return {done: true};;
+        }
+    }
 };
-
 ```
 
 **El objeto iterator**  
