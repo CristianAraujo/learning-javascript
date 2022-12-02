@@ -9,6 +9,7 @@ function* generador() {
     yield 3;
     yield 5;
     yield 7;
+    return `terminado`;
 }
 
 let primos = generador();
