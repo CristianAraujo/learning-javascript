@@ -200,3 +200,16 @@ g.next(); // {value: undefined, done: true}
 
 Esto no es muy frecuentemente usado, pero pude ser útil cuando necesitemos terminar la ejecución de un generador con un determinado estado.
 
+## Generadores asyncrónos
+
+Los generadores asyncrónos son necesarios cuando los valores llegan de manera asyncrona. El caso más común es cuando se realizan solicitudes a través de la red y se recibe la respuesta poco a poco.
+
+## Iterables asyncrónos
+
+Para crear un objeto iterable asyncróno, debemos seguir el `protocolo iterator` con algunos cambios.
+
+- Se usa el método [Symbol.asyncIterator] en lugar de [Symbol.iterator]
+- El método `next()` debe retornar una promesa, la cual será completada con el siguiente valor).
+- Se debe manejar el método `next()` añadiendo `async`.
+- Para iterar sobre un `objeto iterator asyncróno` se usa el bucle `for await (let item of iterable)`
+  
