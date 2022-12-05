@@ -30,4 +30,40 @@ range[Symbol.iterator] = function () {
     };
 };
 
-for (let num of range) {console.log(num)};
+let r = range;
+console.log(`Imprimiendo r:`);
+console.log(r);
+
+console.log('\n');
+
+let iterador = r[Symbol.iterator]();
+console.log(`Imprimiendo iterador de r:`);
+console.log(iterador);
+
+
+// for (let num of range) {console.warn(num)};
+
+// Implementación versión 2
+
+let rango = {
+    from: 0,
+    to: 10,
+
+    [Symbol.iterator]() {
+        this.current = this.from;
+        return this;
+    },
+
+    next() {
+        if (this.current <= this.to) {
+            return { done: false, value: this.current++ };
+        } else {
+            return { done: true };
+        }
+    }
+};
+
+let r2 = rango;
+console.log('\n');
+console.log(`Imprimiendo R2:`);
+console.log(r2);
