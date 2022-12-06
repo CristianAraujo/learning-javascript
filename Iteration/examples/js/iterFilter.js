@@ -1,5 +1,11 @@
 // Fecha: 01 de diciembre del 2022
 
+/**
+ * Ejemplo JavaScript Definitive Guide
+ * Página 330
+ */
+
+
 function iterFilter (iterable, filtro) {
     let iterador = iterable[Symbol.iterator]();
 

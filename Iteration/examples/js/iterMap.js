@@ -1,5 +1,10 @@
 // Fecha: 01 de diciembre del 2022
 
+/**
+ * Ejemplo JavaScript Definitive Guide
+ * Página 330
+ */
+
 function iterMap(iterable, funcion){
     let iterador = iterable[Symbol.iterator]();
 
