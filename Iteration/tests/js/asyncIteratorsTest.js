@@ -63,7 +63,10 @@ const asyncRange = {
             last: this.to,
 
             async next() {
+
+                // No entiendo donde se retorna una promesa aquí
                 await new Promise(resolve  => setTimeout(resolve, 1000));
+
                 if (this.current <= this.last) {
                     return {done: false, value: this.current++};
                 } else {
@@ -78,5 +81,13 @@ async function callAsyncRange() {
     for await (let num of asyncRange) console.log(num);
 }
 
-callAsyncRange();
+// callAsyncRange();
 
+let iterator = asyncRange[Symbol.asyncIterator]();
+console.log('Iterator:');
+console.log(iterator);
+
+console.log('Llamando async next():');
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
