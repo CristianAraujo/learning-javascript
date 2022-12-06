@@ -1,5 +1,10 @@
 // Fecha: 02 de diciembre del 2022
 
+/**
+ * Ejemplo Modern JavaScript
+ * https://javascript.info/async-iterators-generators
+ */
+
 let Range = {
     from: 1,
     to: 5,
