@@ -61,3 +61,12 @@ Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe 
 `done`: Toma un valor booleano, es false si el iterador puede producir otro valor en la secuencia. Toma el valor true cuando el iterador ya a producido todos los valores en la secuencia. En este caso puede implementar un método `return`.
 
 `value`: Corresponde al valor retornado por el iterador, puede ser cualquier tipo permitido por JavaScript. Puede ser omitido si `done` es true.
+
+## Iterables asyncrónos
+
+Para crear un objeto iterable asyncróno, debemos seguir el `protocolo iterator` con algunos cambios.
+
+- Se usa el método [Symbol.asyncIterator] en lugar de [Symbol.iterator]
+- El método `next()` debe retornar una promesa, la cual será completada con el siguiente valor).
+- Se debe manejar el método `next()` añadiendo `async`.
+- Para iterar sobre un `objeto iterator asyncróno` se usa el bucle `for await (let item of iterable)`
