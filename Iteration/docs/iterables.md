@@ -64,9 +64,23 @@ Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe 
 
 ## Iterables asyncrónos
 
+Los iterables asincrónos son objetos similares a los iterables sincrónos, la diferencia es que los primeros entregan los valores de manera asíncrona. El mecanismo para lograrlo es entregar los valores a través de una secuencia de promesas en lugar de una secuencia de valores.
+
 Para crear un objeto iterable asyncróno, debemos seguir el `protocolo iterator` con algunos cambios.
 
 - Se usa el método [Symbol.asyncIterator] en lugar de [Symbol.iterator]
 - El método `next()` debe retornar una promesa, la cual será completada con el siguiente valor).
 - Se debe manejar el método `next()` añadiendo `async`.
 - Para iterar sobre un `objeto iterator asyncróno` se usa el bucle `for await (let item of iterable)`
+
+```js
+const ayncIterable = {
+    [Symbol.asyncIterator] () {
+        return {
+            async next() {
+                // code
+            }
+        };
+    }
+};
+```
