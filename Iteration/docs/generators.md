@@ -64,7 +64,7 @@ console.log(objetoGenerador.next());
 console.log(objetoGenerador.next());
 ```
 
-Cuando se llama al método `next()` se ejecuta el cuerpo de la función hasta la siguiente sentencia `yield`, pausando la ejecución de la función y retornando el valor de la sentencia `yield`. 
+Cuando se llama al método `next()` se ejecuta el cuerpo de la función hasta la siguiente sentencia `yield`, pausando la ejecución de la función y retornando el valor de la sentencia `yield`.
 
 ## Consumir un generador
 
