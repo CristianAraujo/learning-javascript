@@ -64,7 +64,9 @@ Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe 
 
 ## Iterables asyncrónos
 
-Los iterables asincrónos son objetos similares a los iterables sincrónos, la diferencia es que los primeros entregan los valores de manera asíncrona. El mecanismo para lograrlo es entregar los valores a través de una secuencia de promesas en lugar de una secuencia de valores.
+Los iterables asincrónos son objetos similares a los iterables sincrónos, la diferencia es que los primeros entregan los valores de manera asíncrona, lo que significa que el estado de las propiedades `value` y `done` no son conocidas al momento en que el método `next()` retorna el objeto `iteratorResult`.
+
+El mecanismo para lograrlo es entregar los valores a través de una secuencia de promesas en lugar de una secuencia de valores.
 
 Para crear un objeto iterable asyncróno, debemos seguir el `protocolo iterator` con algunos cambios.
 
@@ -78,9 +80,74 @@ const ayncIterable = {
     [Symbol.asyncIterator] () {
         return {
             async next() {
-                // code
+                return {
+                    new Promise((resolve, rejected) => {
+                        resolve(
+                            { value: <value>, done: <done> }
+                        )
+                    });
+                }
             }
         };
     }
 };
 ```
+
+En el fragemento anterior se muestra el esqueleto de un iterador asíncrono en donde se usa `[Symbol.asyncIterator]` y el método `next()` retorna una promesa. El método `next()` no debes ser necesariamente asíncrono `async next()` este puede crearse de manera regular, pero crearlo de forma asíncrona nos permite usar `await` dentro de este método.
+
+**Ejemplo de iterador Asincróno:**
+
+```js
+class AsyncSequence {
+    constructor (start = 0, end = Infinity,  step = 1) {
+        this.start = start;
+        this.end = end;
+        this.step = step;
+    }
+
+    [Symbol.asyncIterator] () {
+        let counter = 0;
+        let current = this.start;
+
+        next: async () => {
+            if (current <= this.end) {
+                result = { value: current, done: false }
+                current += this.step;
+                counter++;
+
+                return new Promise((resolve, rejected) => {
+                    setTimeout(() => {
+                        resolve(result);
+                    }, 1000)
+                });  
+            }
+
+            return new Promise((resolve, rejected) => {
+                setTimeout(() => {
+                    resolve({
+                        value: counter,
+                        done: true
+                    });
+                }, 1000);
+            });
+        }
+    }
+}
+```
+
+En el ejemplo anterior se observa que el método `next()` retorna `Promesas` en lugar de valores planos. Estos objetos deben ser consumidos por el bucle `for await of` ya que el blucle `for..of` llamará al método `[Symbol.iterator]` y en los iteradores asíncronos nos se usa, en su lugar se usa `[Symbol.asyncIterator]`. Además, si se consume un objeto iterable asíncrono de manera síncrona, este devolverá todos sus valores con estado `pending`.
+
+Ejemplo de consumo de un iterador asíncrono:
+
+```js
+
+async function useAsyncSequence() {
+    for await (const num of new AsyncSequence(1, 10, 2)) {
+        console.log(num);
+    }
+}
+
+useAsyncSequence();
+```
+
+En el ejemplo anterior, debemos usar el bucle `for await of` dentro de una función asíncrona, ya que solo dentro de funciones asíncronas podemos hacer uso de la sentencia `await`.
