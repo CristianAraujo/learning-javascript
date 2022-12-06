@@ -151,3 +151,78 @@ useAsyncSequence();
 ```
 
 En el ejemplo anterior, debemos usar el bucle `for await of` dentro de una función asíncrona, ya que solo dentro de funciones asíncronas podemos hacer uso de la sentencia `await`.
+
+Si se intentan consumir directamente los valores de un iterador asíncrono, sin usar la sentencia `await`, este entregará los objetos con un estado pending.
+
+> Ver siguiente ejemplo en: [asyncObject](../tests/js/t_asyncOject.js)
+
+```js
+let asyncObjet = {
+    from: 0,
+    to: 4,
+
+    [Symbol.asyncIterator] () {
+        let current = this.from;
+        let end = this.to
+
+        return {
+            next() {
+                if (current <= end) {
+                    result = {value: current, done: false};
+                    current++;
+
+                    return new Promise((resolve, rejected) => {
+                        setTimeout(() => {
+                            resolve (result);
+                        }, 1000);
+                    });
+                }
+
+                return new Promise((resolve, rejected) => {
+                    setTimeout(() => {
+                        resolve ({value: undefined, done: true});
+                    }, 1000)
+                });
+            }
+        };
+    }
+}
+
+// Consumo correcto de iterable asíncrono
+const useAsycObject = async () => {
+    for await (const num of asyncObjet) {
+        console.log(num);
+    }
+}
+
+useAsycObject();
+
+// Incorrecta manera de consumir el objeto iterador asíncrono
+let objIterator = asyncObjet[Symbol.asyncIterator]();
+console.log(objIterator);
+
+// Llamadas al método next() devolverán Promise { <pending> }
+// ¿Por qué se imprime un 4 al hacer varias llamadas, es como si
+// desde la segunda llamada al método next(), se imprimieran 
+// resuldatos
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+console.log(objIterator.next());
+```
+
+Para resumir. Los `iterables síncronos` se caracterizan por:
+
+- Usar `[Symbol.iterator]()`
+- Devolver objetos `iteratorResult` con valores planos
+- Ser consumidos por el bucle `for..of`
+
+Los `iteradores asíncronos`se caracterizan por:
+
+- Usar `[Symbol.asyncIterator]`
+- Devolver promesas que se resuelven con {value, done}
+- Ser consumidos por el bucle `for await of`
