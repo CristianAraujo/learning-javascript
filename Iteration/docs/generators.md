@@ -200,6 +200,6 @@ g.next(); // {value: undefined, done: true}
 
 Esto no es muy frecuentemente usado, pero pude ser útil cuando necesitemos terminar la ejecución de un generador con un determinado estado.
 
-## Generadores asyncrónos
+## Generadores asíncronos
 
 Los generadores asyncrónos son necesarios cuando los valores llegan de manera asyncrona. El caso más común es cuando se realizan solicitudes a través de la red y se recibe la respuesta poco a poco.

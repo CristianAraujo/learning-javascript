@@ -62,7 +62,7 @@ Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe 
 
 `value`: Corresponde al valor retornado por el iterador, puede ser cualquier tipo permitido por JavaScript. Puede ser omitido si `done` es true.
 
-## Iterables asyncrónos
+## Iterables asíncronos
 
 Los iterables asincrónos son objetos similares a los iterables sincrónos, la diferencia es que los primeros entregan los valores de manera asíncrona, lo que significa que el estado de las propiedades `value` y `done` no son conocidas al momento en que el método `next()` retorna el objeto `iteratorResult`.
 
