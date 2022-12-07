@@ -1,6 +1,6 @@
 # Iterables, iteradores y generadores
 
-## Iteración 
+## Iteración
 
 La iteración es la ejecución de una porción de código repetidamente en el tiempo. Para esto, en JavaScript, se debe implementar el `protocolo iterator`. Un protocolo, son reglas de implementación más una interfaz que las usa. En este caso, el `protocolo iterator` conecta dos grupos de entidades en JavaScript:
 
@@ -108,17 +108,25 @@ Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe 
 
 `value`: Corresponde al valor retornado por el iterador, puede ser cualquier tipo permitido por JavaScript. Puede ser omitido si `done` es true.
 
+```js
+// Ejemplo de interfaz iteratorResult
+const iteratorResultObj = {
+    value: 0,
+    done: false
+}
+```
+
 ## Iterables asíncronos
 
 Los iterables asincrónos son objetos similares a los iterables sincrónos, la diferencia es que los primeros entregan los valores de manera asíncrona, lo que significa que el estado de las propiedades `value` y `done` no son conocidas al momento en que el método `next()` retorna el objeto `iteratorResult`.
 
 El mecanismo para lograrlo es entregar los valores a través de una secuencia de promesas en lugar de una secuencia de valores.
 
-Para crear un objeto iterable asyncróno, debemos seguir el `protocolo iterator` con algunos cambios.
+Para crear un objeto iterable asincrono, debemos seguir el `protocolo iterator` con algunos cambios.
 
 - Se usa el método [Symbol.asyncIterator] en lugar de [Symbol.iterator]
-- El método `next()` debe retornar una promesa, la cual será completada con el siguiente valor).
-- Se debe manejar el método `next()` añadiendo `async`.
+- El método `next()` debe retornar una promesa, la cual será completada con el siguiente valor.
+- Se puede manejar el método `next()` añadiendo `async`, aunque no es obligatorio.
 - Para iterar sobre un `objeto iterator asyncróno` se usa el bucle `for await (let item of iterable)`
 
 ```js
