@@ -2,3 +2,4 @@
 
 1. ¿Cual es la diferencia entre un `objeto generador` y un `objeto iterador`? ¿Cuál es la diferencia entre generadores e iteradores?
 2. ¿Cuando usar `iterables` o `iterators` directamente?
+3. ¿Como funciona el método `throw(value)` en los iterators?

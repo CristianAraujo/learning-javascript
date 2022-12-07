@@ -66,6 +66,8 @@ let iterador = makeIterator();
 console.log(iterador.next());
 ```
 
+En el ejemplo anterior, la función [makeIterator](../tests/js/t_makeIterator.js) retorna un `objeto iterator` el cual puede ser consumido manualmente llamando al método `next()`. Sin embargo, no puede consumirse mediante un bucle `for..of` debido a que no implementa el `protocolo iterable`.
+
 El método `next()` puede recibir cero o un argumento, el cual puede usarde en los [generadores](generators.md).
 
 El `objeto iterator` opcionalmente puede también los métodos `return(value)` y `throw(exception)`.
@@ -73,14 +75,31 @@ El `objeto iterator` opcionalmente puede también los métodos `return(value)` y
 El método `return(value)` acepta cero o más argumentos y retorna un  objeto que implementa la interface `IteratorResult`. Llamar a este método le indica al iterador que no se podrán hacer nuevas llamadas al método `next()` y se desarrollan tareas de limpieza.
 
 ```js
+function makeIterator(from, to) {
+    let current = from;
 
+    return {
+        next() {
+            if (current <= to) {
+                result = { value: current, done: false };
+                current++;
+                return result;
+            }
+            return { value: undefined, done: true } 
+        },
+
+        return(valor) { 
+            return { value: valor, done: true } 
+        },
+
+        throw(exception) {
+            console.log(`Error inesperado ${exception}`);
+        }
+    };
+}
 ```
 
 El método `throw()` acepta cero o más argumentos, retorna un objeto que implementa la interface `IteratorResult`, llamar a este método le indica al iterador que se ha detectado un error.
-
-```js
-
-```
 
 **Objeto IteratorResult**  
 Un objeto Iterator Result implementa la interfaz `IteratorResult`, la cual debe tener las siguientes propiedades:
