@@ -84,11 +84,11 @@ for (let valor of generador) {
 }
 ```
 
-En el ejemplo anterior, solo se imprimirán los números 1 y 2, ya que cuando se retorna el número 3, con la sentencia `return` el generador se encuentra con su propiedad `done: true`, por lo que este valor será ignorado. Para evitar esto, se debería cambiar la sentencia `return` por una sentencia `yield`.
+En el ejemplo anterior, solo se imprimirán los números 1 y 2, ya que cuando se retorna el número 3, con la sentencia `return` el generador se encuentra con su propiedad `done: true`, por lo que este valor será ignorado debido al que el bucle `for..of` solo imprime lo valores cuya propiedad `done: false`. Para evitar esto, se debería cambiar la sentencia `return` por una sentencia `yield`.
 
 ## Uso de generadores en lugar de iterables
 
-Los `objetos generadores` también son `iterators` por lo que podemos usarlos en el lugar de los iteradores. Por ejemplo, en el iterable, `Range` podemos devolver un generador en lugar de un iterador:
+Los `objetos generadores` también son `iterators` por lo que podemos usarlos su lugar. Por ejemplo, en el iterable, `Range` podemos devolver un generador en lugar de un iterador. Para esto agregamos un asterisco `*` antes del método `[Symbol.iterator]()` convirtiendo este método en una función generadora, de esta manera el objeto que retorne este método será un objeto generador, que a su vez es un iterador:
 
 ```js
 const Range = {
