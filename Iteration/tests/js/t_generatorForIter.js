@@ -19,5 +19,12 @@ function iterGenerator(from, to) {
     };
 }
 
-let numbers = iterGenerator(1, 4);
-console.log(numbers.next());
+let numbers = iterGenerator(1, 2);
+console.log(numbers);
+// console.log(numbers.next());
+
+let numbersSequence = numbers[Symbol.iterator]();
+console.log(numbersSequence);
+console.log(numbersSequence.next());
+console.log(numbersSequence.next());
+console.log(numbersSequence.next());
