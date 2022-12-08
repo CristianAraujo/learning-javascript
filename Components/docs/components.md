@@ -219,3 +219,68 @@ La encapsulación que nos brinda el `shadow DOM` comprende:
   alert(elem.shadowRoot.querySelectorAll('p').length); // 1
 </script>
 ```
+
+## Template element
+
+El elemento prefabricado `<template>` sirve como un contenedor que almacena marcado HTML, el cual podemos. El navegador ignorará su contenido y solo comprobará que su sintaxis sea válida, esto hasta que el elemento se inserte en el documento.
+
+```html
+<template>
+    <style>
+        p { font-weight: bold; }
+    </style>
+    <script>
+        alert('Hola');
+    </script>
+</template>
+```
+
+En el ejemplo anterior vemos como se crea un fragmento de marcado html el cual es envuelto entre las etiquedas `<template>` y `<template>`.
+
+El navegador considera el contenido, como fuera del documento, por lo que los estilos, scripts y etiquetas `<video autoplay>` no serán aplicadas hasta que el elemento `<template>` se inserte.
+
+### Insertando template
+
+El contenido de un elemento `<template>` esta disponible en su propiedad `content` y es devuelto en forma de `DocumentFragment`.
+
+Podemos tratar a un template como cualquier otro nodo del DOM, excepto que cuando insertamos un template, sus hijos sun insertados en el lugar.
+
+```html
+<template id="tmpl">
+    <script>
+        alert("Hola desde template");
+    </script>
+    <div class="message">hola desde div tempalte</div>
+</template>
+
+<script>
+    let elem = document.createElement('div');
+    
+    // Clonamos el contenido de template
+    elem.append(tmpl.content.cloneNode(true));
+
+    document.body.append(elem);
+
+</script>
+```
+
+Rescrbiendo el ejemplo anterior que hacia uso de un `shadow DOM` usando `<template>`:
+
+```html
+<template id="tmpl">
+    <style> p { font-color: blue; } </style>
+    <p id="message"></p>
+<template>
+
+<div id="elem">Dame click</div>
+
+<script>
+    elem.onclick = function () {
+        elem.attachShadow( { mode: 'open' } );
+        elem.shadowRoot.append(tmpl.content.cloneNode(true));
+        elem.shadowRoot.getElementById('message').innerHTML = 'Hola desde las sombras';
+    };
+</script>
+```
+
+En el ejemplo anterior, los elementos `<style>` y `<p>` son insertados dentro del `<div>`con id `elem` y se accede al párrafo mediante la propiedad `shadowRoot`.
