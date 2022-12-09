@@ -1,6 +1,6 @@
 # Web Components
 
-Podemos crear nuestros propios elementos HTML mediante clases JavaScript, con sus propios métodos, propiedades, eventos y más. 
+Podemos crear nuestros propios elementos HTML mediante clases JavaScript, con sus propios métodos, propiedades, eventos y más.
 
 Hay dos tipos de de elementos personalizados:
 
@@ -70,6 +70,7 @@ class TimeFormatted extends HTMLElement { // (1)
   
 customElements.define("time-formatted", TimeFormatted);
 ```
+
 Cuando el navegador encuentra elementos personalizados antes que estos sean definidos con `customElements.define` esto no arroja error, aunque el elemento aun es una etiqueta desconocida. Cuando se encuentra el registro del elemento, este es actualizado. Para obtener información sobre elementos tenemos algunos métodos como:
 
 - `customElements.get(name)`: Retorna la clase para el elemento personalizado cuyo nombre fue pasado como parámetro.
