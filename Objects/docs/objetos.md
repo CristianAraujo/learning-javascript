@@ -336,3 +336,60 @@ let s = JSON.stringify(o);
 let q = JSON.parse(s);
 ```
 
+Objetos, arrays, strings, números finitos, true, false y null pueden ser serializados y restaurados. NaN, Infinity, y -Infinity son serializados como null. Funciones, expresiones regulares y Errores no pueden ser serializados.
+
+La función `JSON.stringify()` solo serializa las propiedades pertenecientes al objeto que son enumerables.
+
+## Métodos en objetos
+
+Se explicaran métodos universales, definidos en Object.prototype.
+
+**toString()**  
+No toma argumentos y retorna un string que se alguna manera representa el valor del objeto donde es invocado. El comportamiento por defecto no es muy informativo.
+
+```js
+let s = {o: 1, p: 2}.toString();
+```
+
+Es posible definir un método toString propio, por ejemplo:
+
+```js
+let o = {
+    x: 1,
+    y: 2,
+    toString: function { return `(${this.x}, ${this.y})`};
+}
+```
+
+**toLocateString()**  
+El próposito de este método es retornar un string con formato localizado geograficamente.
+
+```js
+let punto = {
+    x: 1000,
+    y: 2000,
+    toLocateString: function () {
+        return `(${this.x.toLocateString()}, ${this.y.toLocateString()})`;
+    }
+}
+```
+
+**valueOf()**  
+Convierte un objeto en algun valor primitivo. JavaScript llama a este método automaticamente cuando un objeto es usado en un lugar que se requiere un valor primitivo. Por ejemplo los objetos Date implementan este método para obtener valores númericos y así poder comparar fechas.
+
+```js
+let point = {
+    x: 4,
+    y: 4,
+    valueOf: function () {
+        return Math.hypot(this.x, this.y);
+    }
+}
+
+Number(point);
+point < 3;
+point > 1; 
+```
+
+**toJSON**  
+`JSON.stringify()` busca la existencia de un método `toJSON` y si existe, al serializarlo, `JSON.stringify()` lo llama y retorna su valor como resultado de la serialización.
