@@ -263,3 +263,33 @@ o.x !== undefined;
 "x" in o
 ```
 
+## Enumerar propiedades
+
+Para enumerar propiedades se usa comunmente el `for/in` loop el cual asignará el nombre nombre de la propiedad a la variable del bucle en cada iteración. Se debe tener en cuenta que los métodos `built-in` heredados no son enumerables.
+
+```js
+const ciudades = { 
+    Filipinas: "Manila", 
+    Malasia: "Kuala Lumpur",
+    Tailandia: "Bangkok",
+    Vietnam: "Hanoi" 
+};
+
+for (const pais in cuidades) {
+    console.log(pais);
+}
+```
+
+Existe la alternativa de obtener un array de los nombres de las propiedades y luego itererar con `for/of`. Podemos obtener un array con los nombres de las propiedades con:
+
+- `Object.keys`: Retorna una array con los nombres de las propiedades enumerables y no heredadas del objeto.
+- `Object.getOwnPropertyNames`: Igual que `Object.keys`, pero incluye propiedades no enumerables.
+- `Object.getOwnPropertysymbols`: Retorna los nombres de las propieades no heredadas cuyos nombres son símbolos, sean o no propiedades enumerables.
+- `Reflect.ownKeys`: Retorna todas las propiedades, sean o no enumerables y sean strings o símbolos.
+
+**Orden de enumeración** 
+
+- Primero se enumeran todos los nombres que son enteros no negativos de menor a mayor.
+- Luego todas las propiedades restantes, tipo string, números negativos o flotantes son enumerados en el orden que fueron agregados al objeto. En objetos literales, estos se enumeran en la manera que aparecen en el objeto.
+- Finalmente se enumera las propiedades que son símbolos.
+- Luego se enumeran propiedades heredadas. Si ya existe una propiedad con el mismo nombre que ya fue enumerada, la propiedad heredada no será enumerada.
