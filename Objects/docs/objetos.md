@@ -153,3 +153,40 @@ unitcircle.r
   - El objeto tiene su propia propiedad y es de solo lectura.
   - el objeto ha heredado la propiedad y es de solo lectura.
   - El objeto no tiene la propiedad ni la ha heredado, y además el objeto no es extendible.
+
+## Borrar propiedades de los objetos
+
+Para borrar propiedades usamos el operador `delete` el cual remuve propiedades de los objetos. El operador `delete` no opera en los valores de los objetos, opera en la propiedad en si misma.
+
+```js
+let persona = {
+    nombre: 'Luna',
+    pais: 'Serbia',
+    edad: 24
+}
+
+// Se borra propiedad nombre de objeto persona
+delete persona.nombre;
+```
+
+El operador `delete` opera sobre las propiedades pertenecientes al objeto en si, no sobre propiedades heredadas. Para borrar propiedades heredades, se deben borrar donde fueron definidas.
+
+El operador `delete` no puede removar propiedades con el atributo `configurable` en false, como lo son propiedades del objeto global creadas por declaración de variables y funciones. En strict mode esto causa TypeError.
+
+```js
+// False. La propiedad no es configurable (atributo configurable es false)
+delete Object.prototype
+
+// Se declara una variable global
+var x = 1;
+
+// False. No se puede borrar esta propiedad
+delete globalThis.x
+
+// Declaración de una función
+function f() {}
+
+// False. No se puede borrar 
+delete globalThis.f
+```
+
