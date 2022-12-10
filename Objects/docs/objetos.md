@@ -89,3 +89,34 @@ Los objetos literales tienen el mismo prototipo, `Object.prototype`. Los objetos
 Casi todos los objetos tienen un prototipo, pero una pequeña cantidad de objetos tienen la propiedad `prototype`, quienes la tienen son quinees definen los prototipos para todo el resto de objetos.
 
 La mayoria de los `built-in` constructors y aquellos definidos por el usuario tienen un prototipo que hereda desde `Object.protype`.
+
+## Consultando y configurando propiedades
+
+Para obtener una propidad podemos usar el operador punto `(.)`  o los parentesis cuadrados `[]`. En la izquieda debemos tener una expresión cuyo valor sea un objeto, mientras que si usamos el operador punto, a la derecha debemos tener un identificador simple y si usamos parentesis cuadrados, debe ser una expresión que evalue a un string con el nombre de la propiedad que se busca:
+
+```js
+let autor = book.autor;
+let nombre = autor.nombre;
+let titulo = book["titulo principal"];
+```
+
+Para crear o configurar una propiedad:
+
+```js
+book.edicion = 7;
+book["titulo principal"] = "ECMAScript";
+```
+
+### Objetos como arrays asociativos
+
+Usando la notación con llaves, el nonmbre de las propiedades de los objetos es expresada como un string y podemos manipularla en tiempo de ejecución, lo que no podemos hacer con la sintaxis de punto.
+
+```js
+    let direccion = "";
+    for (let i = 0; i < 4; i++){
+        direccion += cliente[`direccion${i}`] + "\n";
+    }
+```
+
+En el ejemplo anterior el resultado seria: direccion0, direccion1, direccion2, direccion3.
+
