@@ -190,3 +190,76 @@ function f() {}
 delete globalThis.f
 ```
 
+## Testing de propiedades
+
+Se puede usar:
+
+- El operador `in`
+- Función `hasOwnProperty()`
+- Función `propertyIsEnumerable()`
+- Simplemente preguntando la propiedad
+
+**Operador in**
+Se indica la propiedad en el lado izquierdo y el objeto en el derecho:
+
+```js
+let o = { x: 1 };
+"x" in o
+"y" in o
+"toString" in o
+```
+
+**hasOwnProperty**
+Solo comprueba propiedades no heredadas
+
+```js
+let o = { x: 1 };
+o.hasOwnProperty("x");
+o.haOwnProperty("y");
+o.hasOwnProperty("toString");
+```
+
+**propertyIsEnumerable()**
+Retorna verdadero si las propiedades son propias del objeto y el atributo de la propiedad _enumerable_ es true.
+
+```js
+let o = { x: 1 };
+
+// Verdadero: propiedad es enumerable
+o.propertyIsEnumerable("x");
+
+// False: Propiedad heredada
+o.propertyIsEnumrable("toString");
+
+// False: Propiedad no enumerable
+o.prototype.propertyIsEnumerable("toString");
+```
+
+**Consultar la propiedad**
+En lugar de usar el operador `in` podemos consultar la propiedad, consultando si esta no es `undefined`:
+
+```js
+let o = { x: 1 };
+
+// False, la propiedad está definida
+o.x !== undefined;
+
+// True, la propiedad no está definida
+o.y !== undefined;
+
+// False, la propiedad es heredada
+o.toString !== undefined;
+```
+
+La diferenia entre esto último y usar el operador `in` es que con el operador `in` podemos distinguir aquella propiedades que existan, pero cuyo valor sea `undefined`.
+
+```js
+let o = { x: undefined };
+
+// False, la propiedad existe, pero es definida a undefined
+o.x !== undefined;
+
+// True, la propiedad existe en el objeto
+"x" in o
+```
+
