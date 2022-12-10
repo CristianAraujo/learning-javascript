@@ -287,9 +287,37 @@ Existe la alternativa de obtener un array de los nombres de las propiedades y lu
 - `Object.getOwnPropertysymbols`: Retorna los nombres de las propieades no heredadas cuyos nombres son símbolos, sean o no propiedades enumerables.
 - `Reflect.ownKeys`: Retorna todas las propiedades, sean o no enumerables y sean strings o símbolos.
 
-**Orden de enumeración** 
+Orden de enumeración
 
 - Primero se enumeran todos los nombres que son enteros no negativos de menor a mayor.
 - Luego todas las propiedades restantes, tipo string, números negativos o flotantes son enumerados en el orden que fueron agregados al objeto. En objetos literales, estos se enumeran en la manera que aparecen en el objeto.
 - Finalmente se enumera las propiedades que son símbolos.
 - Luego se enumeran propiedades heredadas. Si ya existe una propiedad con el mismo nombre que ya fue enumerada, la propiedad heredada no será enumerada.
+
+## Extendiendo objetos
+
+Extender un objeto es copiar las propiedades de un objeto a otro. Para esto existe el método `Object.assign()`, el cual como primer argumento recibe un objeto llamado objeto objetivo y luego puede recibir consecutivos objetos los cuales son objetos fuente. Las propiedades de los objetos fuentes, se copiarán en el objeto objetivo.
+
+Las propiedades con el mismo nombre se irán sobreescribiendo, así las propiedades que aparecen al después sobreescribirán las anteriores.
+
+```js
+let a = { x: 1, y: 2 };
+let b = { s: 3, j: 4 };
+let c = { p: 4, q: 6 };
+
+Object.assign(a, b, c);
+console.log('a:', a);
+```
+
+Podemos crear un nuevo objeto copiando las propiedades de la siguiente manera:
+
+```js
+let g = { x: 1, y: 2 };
+let h = { s: 3, j: 4 };
+let i = { p: 4, q: 6 };
+
+let n = Object.assign({}, g, h, i);
+console.log('n:', n);
+```
+
+Lo anterior también se puede conseguir con `spread operator` que se verá más adelante.
