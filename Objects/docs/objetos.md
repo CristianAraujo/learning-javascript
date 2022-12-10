@@ -120,3 +120,25 @@ Usando la notación con llaves, el nonmbre de las propiedades de los objetos es 
 
 En el ejemplo anterior el resultado seria: direccion0, direccion1, direccion2, direccion3.
 
+### Herencia
+
+Se dice que las propiedades pertenecen a un objeto si estas no son heredadas desde su objeto prototipo. Si consultamos por propiedades, si estas no son encontradas en el objeto, entonces se buscaran subiendo por la cadena de prototipos.
+
+Si se asinga una propiedad a un objeto y esta propiedad no existe, entonces el objeto tendrá una nueva propiedad no heredada, pero si la propiedad ya existe en la cadena de herencia de prototipos, entonces el valor heredado es ocultado, predominando el valor asignado al objeto. Si el objeto hereda una propiedad x la cual es de solo lectura, no se podrá asignar un nuevo valor.
+
+```js
+// Definimos un objeto
+let unitcircle = { r: 1 };
+
+// Creamos un objeto que hereda desde initcircle
+let c = Object.create(unitcircle);
+
+// El objeto c define atributos propios x e y
+c.x = 1; c.y = 1;
+
+// El objeto c sobreescribe el valor de r
+c.r = 2;
+
+// El valor de r del objeto unitcircle no se altera por la reasgnación de c
+unitcircle.r 
+```
