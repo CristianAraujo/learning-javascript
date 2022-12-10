@@ -142,3 +142,14 @@ c.r = 2;
 // El valor de r del objeto unitcircle no se altera por la reasgnación de c
 unitcircle.r 
 ```
+
+### Errores en acceso a propiedades
+
+- Si una propiedad no es encontrada esto arroja `undefined`
+- `null` y `undefined` no tienen propiedades, intentar acceder a sus propiedadaes arrojará error.
+- Acceder a propiedades de un objeto que evalua a `null` o `undefined` causas un `TypeError`.
+- En `strict mode` ocurre un `TypeError` cuando un intento de asignación falla.
+- Las asignaciones fallarán si:
+  - El objeto tiene su propia propiedad y es de solo lectura.
+  - el objeto ha heredado la propiedad y es de solo lectura.
+  - El objeto no tiene la propiedad ni la ha heredado, y además el objeto no es extendible.
