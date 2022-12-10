@@ -321,3 +321,18 @@ console.log('n:', n);
 ```
 
 Lo anterior también se puede conseguir con `spread operator` que se verá más adelante.
+
+## Serializando objetos
+
+La serializaciíon de objetos es el proceso de convertir el estado de un objeto a un string, desde el cual podremos recuperarlo posteriormente. Para esto tenemos las funciones `JSON.stringify()` y `JSON.parse()`, estas funciones usa el fofrmato `JSON`.
+
+```js
+let o = { 
+    x: 1, 
+    y: { z: [false, null, ""]}
+}
+
+let s = JSON.stringify(o);
+let q = JSON.parse(s);
+```
+
