@@ -79,3 +79,13 @@ Uno de los usos de `Object.create` es poder pasar un objeto a una función para 
 let o = { x: "no cambiar este valor:" };
 libreria.function(Object.create(o));
 ```
+
+## Prototypes
+
+Casi todos los objetos en JavaScript tienen un segundo objeto relacionado, este segundo objeto es conocido como prototipo, y el primero hereda de este último.
+
+Los objetos literales tienen el mismo prototipo, `Object.prototype`. Los objetos creados con la palabra clave `new` usan el protitipo de la función constructura como el suyo.
+
+Casi todos los objetos tienen un prototipo, pero una pequeña cantidad de objetos tienen la propiedad `prototype`, quienes la tienen son quinees definen los prototipos para todo el resto de objetos.
+
+La mayoria de los `built-in` constructors y aquellos definidos por el usuario tienen un prototipo que hereda desde `Object.protype`.
