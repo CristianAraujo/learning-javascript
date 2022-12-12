@@ -393,3 +393,73 @@ point > 1;
 
 **toJSON**  
 `JSON.stringify()` busca la existencia de un método `toJSON` y si existe, al serializarlo, `JSON.stringify()` lo llama y retorna su valor como resultado de la serialización.
+
+## Extendiendo obbjetos literales
+
+### Shorhand propierties
+
+En ES6, podemos crear objetos a partir de identificadores:
+
+```js
+let x = 5, y = 10;
+let obj = {x, y};
+```
+
+### Nombres computados de propiedades
+
+Desde ES6 se nos permite usar la notación de corchetes para crear objetos cuyos nombres son expresiones que al computarse resultarán en un nombre válido de propiedad. Por ejemplo:
+
+```js
+const NOMBRE_PROPIEDAD = "p1";
+function computarNombre () { return "p" + 2; }
+
+```
+
+### Symbols como nombres de propiedades
+
+Si se asigna un `Symbol` a una variable o constante, entonces se podrá usar ese `Symbol` comoo nombre de una propiedad, usando la sintaxis computada.
+
+```js
+const extension = Symbol("my extension symbol");
+let o = {
+    [extension]: { /* Extension data store in this object */ }
+};
+o[extension].x = 0; 
+```
+
+Los Symbols son primitivos, por lo que `Symbol()` no es una función constructora que se pueda invovar con `new`. Dos Symbols creados con el mismo string, son aún diferentes.
+
+### Spread operator
+
+Es un caso especial de sintaxis disponible solo en los objetos literales `...`:
+
+```js
+let position = { x: 1, y: 2 };
+let dimensions = { width: 100, height: 75 };
+let rect = { ...position, ...dimensions };
+```
+
+Si los objetos que vienen posteriormente tienen propiedades con el mismo nombre que los primeros, estas sustituirán a las primeras.
+
+Se debee tener presente que el spread operator conlleva un sustancial trabajo del intérprete.
+
+### Shorhand methods
+
+En ES6 podemos escribir las funciones en los objetos directamente:
+
+```js
+// Con shorcut
+let cuadrado = {
+    area () { return this.lado * this.lado; },
+    lado: 10
+};
+cuadrado.area()
+
+// Antes de ES6
+let rectangulo = {
+    base: 10,
+    altura: 5,
+    area: function () { return this.base * this.altura; }
+}
+rectangulo.area()
+```
