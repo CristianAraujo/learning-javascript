@@ -153,3 +153,9 @@
 1. ¿Qué significa que las funciones tengan propiedades?
 2. Nombrar un caso común donde pueda usarse una propiedad de función.
 3. Crear una función que calcule el factorial de un número pasado como parámetro y que use una propiedad de función para almacenar resultados parciales como caché.
+
+## Funciones como espacio de nombres
+
+1. ¿Cual es el ámbito de las variables declaradas dentro de una función?
+2. ¿Cuando es útil usar las funciones como espacio de nombres? Dar un ejemplo.
+3. Escribir una función que pueda usarse como espacio de nombres que no declare ninguna variable fuera de su ámbito.

@@ -719,3 +719,27 @@ factorial[1] = 1;
 factorial(6);
 factorial[5];
 ```
+
+---
+
+## Funciones como Namespaces (Espacio de nombres)
+
+Las variables declaradas dentro de funciones solo son visibles dentro de la función, por lo que su ámbito es el cuerpo de la función. Decimos que la función crea un espacio de nombres propio. Esto es útil cuando usamos un fragmento de código en muchos lugares, podemos poner este código dentro de una función para evitar conflictos de nombres.
+
+```js
+function space() {
+    // Definición de variables con ámbito de función
+}
+
+space();
+```
+
+En el ejemplo anterior, la creación de la función define una variable en el programa. Podemos crear una función autoinvocable que no cree ninguna variable:
+
+```js
+(function(){
+    // Definición de variables con ámbito de función
+}());
+```
+
+El uso de funciones como espacio de nombres es muy útil cuando se definen funciones que pueden usar este espacio de nombres de su función contenedora.
