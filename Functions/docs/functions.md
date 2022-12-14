@@ -468,7 +468,7 @@ Este objeto data de los primeros tiempos de JavaScript y ya no debería ser usad
 
 ### Spread operator en las llamadas a funciones
 
-`Spread operator` no es un operador en realidad en el sentido que no puede evaluar operandos para producir un valor. 
+`Spread operator` no es un operador en realidad en el sentido que no puede evaluar operandos para producir un valor.
 
 Cuando usamos la sintaxis de tres puntos `...` en la definición de funciones obtenemos que los valores de los argumentos se estructuren dentro de una array, efecto opuesto que cuando hacemos la invocación en donde los elementos se dispersan como argumentos individuales en la llamada a la función.
 
@@ -603,3 +603,119 @@ function sum(a) {
 ```
 
 En el ejemplo anterior, la función comprueba al inicio el tipo de datos para un mejor manejo de errores.
+
+---
+
+## Funciones como valores
+
+Las funciones no solo son sintaxis para declarar bloques de código ejecutable, también son valores, por lo que podemos tratarlos como tal, pasandolas como parámetros a otras funciones, asignarlas a variables, almacenarlas en propiedades de objetos o como elementos de una array, etc.
+
+Por ejemplo:
+
+```js
+// Creación de una función declara una variable y asigna el objeto función a dicha variable
+function square (x) { return x*x; }
+
+// Podemos asignar la función a otra variable
+let s = square;
+square(4);
+s(4);
+
+// Es posible tambien asignar funciones como propiedades de objetos
+const obj = {
+    square: function (x) { return x*x; }
+};
+
+let r = obj.square(4);
+
+// Asignación de funciones como elementos de un array
+let arr = [1, 2, square];
+
+// Se guarda una función anónima como elemento de un array
+let sqr = [x => x*x, 2];
+
+// Se llama a la función almacenada en el primer elemento, y se pasa como argumento el valor almacenado en el segundo elemento.
+let res = sqr[0](sqr[1]);
+```
+
+Un ejemplo de uso de funciones como valores es `Array.sort()`. Esta función para cualesquiera dos valores pasados, retorna el valor que deberia ubicarse primero en un array ordenado.
+
+**Ejemplo de funciones como valores**  
+Un ejemplo de funciones usadas como valores, considerar:
+
+```js
+function add(x, y) { retun x + y; }
+function substract(x, y) { return x - y; }
+function multiply(x, y) { return x * y; }
+function division(x , y) { return x / y; }
+
+// Se define función operate que usa las funciones anteriores como valores
+function operate(operator, operand1, operand2) {
+    return operator(operand1, operand2);
+}
+
+// Invocamos la función para que compute (2+3) + (4*5)
+let i = operate(add, operate(add, 2,3), operate(multiply(4,5)));
+```
+
+Para el ejemplo anterior también es posible definir las funciones como valores que forman parte de un objeto literal.
+
+```js
+let operators = {
+    add: (x, y) => x + y,
+    substract: (x, y) => x - y,
+    multiply: (x, y) => x * y,
+    division: (x, y) => x / y,
+    pow: (x, y) => Math.pow(x, y)
+}
+
+function operate(operation, operand1, operand2)  {
+    if (typeof operate[operation] === 'function') {
+        return operators[operation](operand1, operand2);
+    } else {
+        throw "Operador desconocido";
+    }
+}
+
+operate("pow", 10, 2);
+operate("add", "hello", "world");
+```
+
+### Definir propiedades propias para funciones
+
+Las funciones no son un tipo primitivo en JavaScript, son un tipo especializado de objetos, por lo que pueden tener propiedades.
+
+**Ejemplo de uso y creación de propiedades de funciones**  
+Por ejemplo, si necesitamos que un valor sea estático y persista entre las invocaciones de cada función, podemos crear una propiedad que pertenesca al objeto función en si.
+
+```js
+// Definimos una propiedad sobre el objeto uniqueInteger que corresponde a un objeto function
+uniqueInteger.counter = 0;
+
+// Hacemos que la función retorne el valor de su propiedad
+function uniqueInteger () {
+    return uniqueInteger.counter++;
+}
+
+uniqueInteger();
+uniqueInteger();
+```
+
+Otro, ejemplo, considerar la siguiente función `factorial()` que usa una de sus propiedades para almacenar sus resultados parciales.
+
+```js
+function factorial(n) {
+    if (Number.IsInteger(n) && n > 0) {
+        if (!(n in factorial)) {
+            factorial[n] = n * factorial(n - 1);
+        } 
+        return factorial[n];
+    } else {
+        return NaN;
+    }
+}
+
+factorial[1] = 1;
+factorial(6);
+factorial[5];
+```

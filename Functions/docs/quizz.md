@@ -22,7 +22,7 @@
 ### Funciones expresadas
 
 1. ¿Qué son las funciones expresadas?
-2.  ¿Las funciones expresadas deben llevar nombre?
+2. ¿Las funciones expresadas deben llevar nombre?
 3. ¿Cúal es la diferencia entre una función expresada con nombre y una anónima?
 4. ¿Cual es la diferencia entre asignar una función expresada a una variable declarda con let, con const y con var?
 5. ¿Cómo es tratado el nombre de una función expreasa cuando está tiene nombre?
@@ -86,7 +86,7 @@
 ### Invocación implicita de funciones
 
 1. ¿Qué es la invocación implícita de funciones? Dar ejemplos.
-   
+
 ## Argumentos y parámetros de funciones
 
 1. ¿Cuales con los parámetros y cuales son los argumentos?
@@ -142,3 +142,14 @@
 
 1. ¿Es posible usar datos tipados en argumentos?
 2. ¿Cómo es recomendable realizar la comprobación de tipos?
+
+## Funciones como valores
+
+1. ¿Qué nos permite conseguir el tratar las funciones como valores?
+2. Crear funciones que calculen áreas para triangulo rectangulo, circulos, rectangulos y cuadrados. Posteriormente crear una función que haga uso de ellas como valores.
+
+### Definir propiedades propias para funciones
+
+1. ¿Qué significa que las funciones tengan propiedades?
+2. Nombrar un caso común donde pueda usarse una propiedad de función.
+3. Crear una función que calcule el factorial de un número pasado como parámetro y que use una propiedad de función para almacenar resultados parciales como caché.
