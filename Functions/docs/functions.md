@@ -903,3 +903,148 @@ El códido anterior crea 10 `closures` y los almacena dentro de un array. Los `c
 Es importante recordar que el ámbito asociado con un closure es vivo. Las funciones anidadas no crean copias privadas de este.  
 
 En el ejemplo anterior, el bucle declara la variable i con `var`, por lo que la variable i se encontrará definida con un ámbito de función en lugar de estar limitada al ámbito del bucle. Si reemplazamos `var` con `let` o `const`, solucionamos el problema, ya que `let` y `const` tienen crean identificadores con ámbito de bloque, por lo que cada iteración crearía un ámbito de bloque nuevo e independiente de los ámbitos de otras iteraciones y cada uno de ellos tendría su independiente valor de i.
+
+## Propiedades de funciones, métodos y constructor
+
+Ya que las funciones son objetos, estas pueden tener propiedades y métodos, como cualquier otro objeto. Hay además, un constructor `Function()` para crear nuevos objetos de tipo function.
+
+### La propiedad length
+
+Entrega el número de parametros declarados en la lista. Si una función derclara un parámetro `rest` (parametros variables), este no es contado para propósitos de la propiedad `length`.
+
+### La propiedad name
+
+Especifica el nombre usado cuando la función fue definida si fue definida con un nombre, o el nombre de la variable o propidad a la cual una función anónima fue asignada.
+
+### La propiedad prototype
+
+Toas las funciones, excepto la funciones flecha, tienen una propiedad prototype que se refiere a un objeto, conocido como `prototype object`. Cada función tiene defetente `prototype object`.
+
+### Los métodos `call()` y `apply()`
+
+`call()` y `apply()` nos permiten invocar indirectamente una función como si esta fuese parte de algún otro objeto. El primer argumento para ambos, es el objeto en el cual la función será invocada, este es el contexto de invocación y será el valor de `this` en el cuerpo de la función.
+
+Para invocar una función que no recive arguementos, como si perterneciera a un objeto `o`, hacemos lo siguiente:
+
+```js
+const o = { x: 1, y: 2 };
+function f() { return this; }
+
+f.call(o)
+f.apply(o);
+
+// El código anterior es similar al siguiente:
+o.m = f;
+o.m();
+delete o.m;
+```
+
+Si llamamos alguno de estos métodos en las funciones flecha, el primer parámetro será ignorado, ya que las funciones flecha heredan el contexto desde donde son definidas, el cual no puede ser sobreescrito por `call()` o `apply()`.
+
+**Método call()**  
+Cualquier argumento despues del primer serán argumentos que se pasarán a la función invocada (estos argumentos no son ignorados por funciones flecha).
+
+```js
+const o = { x: 1, y: 2 };
+function f(a, b) { return [this, a, b]; }
+f.call(o, a, b);
+```
+
+**Método apply()**
+Para el método `apply()` los argumentos que se pasarán a la función deben ser entregados como un array:
+
+```js
+const o = { x: 1, y: 2 };
+function f(a, b) { return [this, a, b]; }
+f.call(o, [a, b]);
+```
+
+### El método bin()
+
+El método `bin()` une una función a un objeto. Cuando sse invoca el método `bin()` en una función f y se pasa un objeto o, el método `bin()` retorna una nueva función. Invocar a esta nueva función (como función) invocará la función original como método de o. Cualquier argumento pasado a la nueva función serán pasados a la función original.
+
+```js
+// Se crea una función f que retorna el valor de una variable x de su contexto más el valor de una variable y recibida como argumento.
+function f(y) { return this.x + y; }
+
+// Se define un objeto con una propiedad x
+let o = { x: 1 };
+
+// Se aplica el método bin() en la función f, uniendola al objeto o. Esto devuelve una nueva función que al invocarse se invocará como si fuese método del objeto o.
+let g = f.bin(o);
+
+// Invocamos la función g, la cual actua cómo método de o
+g(2);
+
+// Se define un nuevo objeto p, el cual tiene dos propiedades x y la función g.
+let p = { x: 10, g };
+
+// Al llamar a la función g, esta se encuntra aún unida al objeto o, por lo toma este como contexto, siendo en el objeto o el valor de x = 1. El objeto p no actua como contexto de la función.s
+p.g(2)
+```
+
+El contexto de las funciones flecha no puede ser sobre escrito por el método `bind()`.
+
+El caso de uso más comun del método `bind()` es hacer que las funciones que no son funciones flecha se comporten como funciones flecha.
+
+Cualquier argumento que se le pase al método `bind()` después del primero será entregado al valor de this. Algunas veces esto es llamado `curring`.
+
+Veamos un ejemplo:
+
+```js
+// Creo una función que retorna la suma de dos valores que son recibidos como argumentos
+let sum = (x, y) => x + y;
+
+// La función sum es unida a null, y su segundo parámetro se unira a su primera propiedad en su valor de this, esto sería a x. 
+let succ = sum.bin(null, 1);
+
+// Como el valor de x esta unido a 1 por la aplicación de bin() en la expresión anterior, al llamar a la función con un parámetro esto funcionará ya que solo hace falta el valor para y.
+succ(2);
+
+// Se crea una función que necesita unirse a un objeto que tenga una propiedad con nombre x. 
+function f(y, z) { return this.x + y + z; }
+
+// La función f es unidad al objeto literal { x: 1 } y el valor 2 será unido como valor de y.
+let g = f.bin({ x: 1 }, 2 );
+
+// Se puede llamar a la función solo con un valor ya que los otros parámetros tienen valores unidos por el método bind().
+g(3);
+```
+
+>Duda respecto al ejemplo anterior. El valor de `this` de la función nueva regresada por `bind()` será el contexto del objeto al cual de unio. Sin embargo, si se pasan más paramétros al método bind(), estos de unen tambien al objeto?
+
+El nombre de la propiedad de una función retornada por el método `bind()` es el nombre de la función en la que el método `bind()` fue llamado, con el prefijo "bound".
+
+### El método toString()
+
+Los objetos funciones tienen el método `toString()` como casi todos los objetos de JavaScript. En la práctica, la mayoria de las veces (no en todas), la implementación de `toString()` en objetos tipo `function` retornan el código completo de la función. El método en funciones `built-in` retorna algo como `"[native code]"`.
+
+### El constructor Function()
+
+El constructor `Function()` se puede usar para crear funciones. Este espera cualquier número de argumentos como string. El último argumento es el texto del cuerpo de la función, este puede ser cualquier arbitaría combinación de sentencias válidas en JavaScript separadas por puntos y coma. Todos los otros argumentos pasados al constructor especifican los nombres de los parámetros de la función.
+
+```js
+const f = new Function("x", "y", "return x + y;");
+
+// Lo anterior es equivalente a esto:
+const f = function(x, y) { return x + y; };
+```
+
+Debido a que no hay argumentos que especifiquen el nombre de la función, el constructor `Function()` crea funciones anónimas.
+
+Hay algunas cosas que debemos tener en cuenta respecto al constructor `Function()`:
+
+- Permitie crear y compilar funciones dinamicamente en tiempo de ejecución.
+- El constructor `Function()` parsea el cuerpo de la función y crea un nuevo objeto de función cada vez que es llamado.
+- Siempre son compiladas como si fueran `top-level-functions`, lo que quiere decir aunque se creen de manera anidada, son elevadas fuera del ámbito de su función contenedora (recogiendo el objeto global como su contexto?).
+
+```js
+let scope = "global";
+function constructFunction() {
+    let scope = "local";
+    return new Function("return scope");
+}
+
+// Al llamar a constructFunction, esta nos devuelve la función que se crea en su interior, pero al ser esta última creada con el constructor Function(), es elevada como una 'top-level-function', por lo que su variable scope toma el ámbito global y no el ámbito de función.
+constructFunction()();
+```

@@ -168,3 +168,26 @@
 4. ¿Todas las funciones son closures? Explicar.
 5. Crear un ejemplo de closure que agregue propiedades a un objeto de manera dinamica, y dichas propiedades retornen y configuren un valor almacenado en el closure y no en el objeto.
 6. ¿Cuál es el problema que genera definir closures con `var` en lugar de con `let` o `const` si estos closures son creados dentro de un bucle?
+
+## Propiedades de funciones, métodos y constructor
+
+1. ¿Qué es la propiedad `length` de una función y que información nos entrega? Dar un ejemplo de uso.
+2. ¿Qué es la propiedad `name` de una función y que información nos entrega? Dar un ejemplo de uso.
+3. ¿Qué es la propiedad prototype de una función?
+4. ¿Todos los objetos funciones tienen la propiedad prototype?
+5. ¿Todos los objetos funciones tienen la misma propiedad prototype?
+6. ¿Que nos permiten los métodos `apply()` y `call()`?
+7. Dar un ejemplo de uso del método `apply()` y explicar su composición.
+8. Dar un ejemplo de uso del método `call()` y explicar su composición.
+9. ¿Cual es la diferencia entre los métodos `call()` y `apply()`?
+10. ¿Cómo se comportan las funciones flechas con los métodos `call()` y `apply()`?
+11. ¿Qué nos permite el método `bind()`?
+12. ¿Cómo son usados los argumentos porteriores al primero cuando se aplica el método `bind()`?
+13. Dar un ejemplo de uso del método `bind()`. Detallar lo que hace cada línea de código.
+14. ¿A que se le llama `curring`?
+15. ¿Qué información nos entrega el método `toString()` de las funciones?
+16. ¿Cómo se comporta el método `toString()` con funciones definidas por el usario y con funciones `built-in`? Dar ejemplo de uso.
+17. ¿Qué nos pemite el constructor `Function()`?
+18. ¿Cómo crear funciones usando el constructor `Function()`? Dar un ejemplo de uso.
+19. ¿Cómo se comportan las funciones creadas con el constructor `Function()` respecto al contexto que heredan?
+20. ¿Qué características del constructor `Functions()` deberíamos tener en cuenta?
