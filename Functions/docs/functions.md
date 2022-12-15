@@ -743,3 +743,163 @@ En el ejemplo anterior, la creación de la función define una variable en el pr
 ```
 
 El uso de funciones como espacio de nombres es muy útil cuando se definen funciones que pueden usar este espacio de nombres de su función contenedora.
+
+## Closures
+
+JavaScript usa `lexical scoping`, lo que significa que las funciones son ejecutadas usando el ámbito de variables en cual fueron definidas, no el ámbito de variables en el cual ellas son invocadas. Además, el estado interno del objeto función  no solo contiene el código, sino que también una referencia al ámbito en el cual la función fue definida.
+
+Esta combinación de un objeto función y un ámbito en el cual las variables de la función son resueltas es llamado `closure`.
+
+Los clousores son interesantes cuando son invocacos en un ámbito diferente al cual fueron definidos, esto sucede comunmente cuando un objeto de una función anidada es retornado por la función en el cual esta fue definida.
+
+El primer paso para comprender como funcionan los `closures`, es comprender como se comporta el ambito de variables.
+
+```js
+let scope = "global scope";
+function checkscope() {
+    let scope = "local scope";
+
+    // Función retorna el valor de la variable scope
+    function f() { return scope; }
+
+    // Se retorna el objeto función
+    return f;
+}
+
+let s = checkscope();
+```
+
+En el ejemplo anterior, al invocar a la función, esta conserva el ámbito en donde fue definida y no donde es invocada, por lo que el valor de la variable scope será "local scope", que es el valor de la variable interna de la función.
+
+Lo útil de los closures es que capturan el ámbito de la función, las variables locales y parámetros, pudiendolos usar como estados privados respecto a fuera de la función.
+
+```js
+let uniqueIdentifier = (function() {
+    let counter = 0;
+    return function() { return counter++; }
+}());
+
+uniqueIdentifier()
+uniqueIdentifier()
+```
+
+En el ejemplo anterior vemos que el retorno de la función externa es un objeto función, al llamar a la función externa recibimos ese objeto que es asignado a la variable `uniqueInteger`. Para obtener el valor de `counter` debemos invocar el objeto función recibido en `uniqueInteger`, por lo que se agregan los parentesis de invocación. La función anidada tiene acceso al ámbito de variables de la función externa, por lo que podemos usar sin problemas la variable `counter`.
+
+Es perfectamente posible tener dos o más funciones anidadas en una misma función contenedora.
+
+```js
+function counter() {
+    let n = 0;
+    return {
+        count: function() { return n; },
+        reset: function() { n = 0; },
+    };
+}
+
+let c = counter(), d = counter();
+c.count();
+d.count();
+c.reset();
+c.count();
+d.count();
+```
+
+En el ejemplo anterior, los dos métodos comparten acceso a la variable privada `n`. Cada invocación de la función `counter` crea un nuevo ámbito de variables independiente de las invocaciones previas, y una nueva variable privada `n` en ese ámbito.
+
+Es posible combinar esta técnica con propiedades `setters` y `getters`. Por ejemplo:
+
+```js
+function counter(n) {
+    return {
+        get count() { return n++; },
+        set count(m) { 
+            if (m > n) { n = m; }
+            else { throw Error("count debe ser mayor"); }
+        }
+    };
+}
+
+let c = counter(1000);
+c.count;
+c.count;
+c.count = 2000;
+c.count = 2000;
+```
+
+La función anterior define una variabl local n, la cual es un parámetro de la función, pero sabemos que los parámetros son variables locales dentro de la función, por lo cual podemos manipularla. La función retorna un objeto con dos propiedades, cada propiedad contiene como valor una función, las cuales pueden acceder al ámbito donde fueron definidas, es decir al ámbito de la función `counter`.
+
+Veamos el siguiente ejemplo:
+
+```js
+function addPrivateProperty(o, name, predicate) {
+    // El valor pertenece a la función, esta propiedad no formará parte del objeto.
+    let value;
+
+    // Crea una propiedad en el objeto o, que es recibido como argumento, esta propiedad recibe un nombre luego de evaluar la expresión entre [] y almacena una función.
+    o[`get${name}`] = function() { return value; };
+
+    // Crea una propiedad en el objeto o, que es recibido como argumento, esta propiedad recibe un nombre luego de evaluar la expresión entre [] y almacena una función, que invocarla recibe un argumento.
+    o[`set${name}`] = function(v) {
+        if (predicate && !predicate(v)) { 
+            throw new TypeError(`set${name}: invalid value ${v}`);
+        } else {
+            value = v;
+        }
+    };
+}
+
+let a = {};
+
+// Dentro de la función a será el objeto al cual se le agregen las propiedades que almacenan funciones, "Name" evaluará la expresión para los nombres de las propiedades.
+addPrivateProperty(a, "Name", x => typeof x === "string");
+
+// Se llama a la función que se ha agregado al objeto, esta función, hará que el valor de la variable de la función sea configurada con el valor pasado como argumento.
+a.setName("Loreto");
+a.getName();
+
+// Debido a la comprobación, no es posible para esta propiedad, asignarle valores que no sean strings.
+a.setName(0);
+```
+
+>El ejemplo anterior es interesante. Se encuentra en la página 208 del libro JavaScript Definitive Guide. Como duda al respecto: ¿El argumento `name` se evalua dentro de la función de la segunda propiedad, aunque esta función no haya sido invocada?
+
+Es immportante reconcer cuando los `closures` comparten variables que no deberian compartir de manera inadvertida. Por ejemplo:
+
+```js
+// La función constfunc retorna la función flecha () => v
+function constfunc(v) { return () => v; } 
+
+// Creamos una array que contendrá funciones
+let funcs = [];
+
+for(var i = 0; i < 10; i++) { 
+    // cada iteración guardará una función del tipo () => i, por ejemplo () => 2, siempre se retornará una constante
+    funcs[i] = constfunc(i);
+}
+
+// Al acceder a un elemento del array tendremos una función, en este caso se tendrá la función () => 5. Si agregamos los paréntesis, se invocará la función, devolviendo el valor 5.
+funcs[5]();
+```
+
+Cuando trabajamos con código como el anterior, creamos múltiples `closures` usando un bucle, es un error común tratar de mover el bucle dentro de la función que define los `closures`.
+
+```js
+function constfuncs() {
+    let funcs = [];
+    for (var i = 0; i < 10; i++) {
+        funcs[i] = () => i;
+    }
+    return funcs;
+}
+
+let funcs = constfuncs();
+
+// Su resultado será 10.
+funcs[5]();
+```
+
+El códido anterior crea 10 `closures` y los almacena dentro de un array. Los `closures` son todos definindos en la misma invocación de la función, por lo que, ellos comparten el acceso a la variable i. Cuando la función `constfuncs` retorna, la variable i tiene el valor de 10, así todos los `closures` comparten ese valor.
+
+Es importante recordar que el ámbito asociado con un closure es vivo. Las funciones anidadas no crean copias privadas de este.  
+
+En el ejemplo anterior, el bucle declara la variable i con `var`, por lo que la variable i se encontrará definida con un ámbito de función en lugar de estar limitada al ámbito del bucle. Si reemplazamos `var` con `let` o `const`, solucionamos el problema, ya que `let` y `const` tienen crean identificadores con ámbito de bloque, por lo que cada iteración crearía un ámbito de bloque nuevo e independiente de los ámbitos de otras iteraciones y cada uno de ellos tendría su independiente valor de i.

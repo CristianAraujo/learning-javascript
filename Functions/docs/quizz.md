@@ -159,3 +159,12 @@
 1. ¿Cual es el ámbito de las variables declaradas dentro de una función?
 2. ¿Cuando es útil usar las funciones como espacio de nombres? Dar un ejemplo.
 3. Escribir una función que pueda usarse como espacio de nombres que no declare ninguna variable fuera de su ámbito.
+
+## Closures
+
+1. ¿Qué es el `lexical scoping`?
+2. ¿Qué es un closure y como funciona?
+3. ¿Cuando los closures se vuelven más útiles?
+4. ¿Todas las funciones son closures? Explicar.
+5. Crear un ejemplo de closure que agregue propiedades a un objeto de manera dinamica, y dichas propiedades retornen y configuren un valor almacenado en el closure y no en el objeto.
+6. ¿Cuál es el problema que genera definir closures con `var` en lugar de con `let` o `const` si estos closures son creados dentro de un bucle?
