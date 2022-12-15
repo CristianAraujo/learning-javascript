@@ -191,3 +191,7 @@
 18. ¿Cómo crear funciones usando el constructor `Function()`? Dar un ejemplo de uso.
 19. ¿Cómo se comportan las funciones creadas con el constructor `Function()` respecto al contexto que heredan?
 20. ¿Qué características del constructor `Functions()` deberíamos tener en cuenta?
+
+### Memoization
+
+1. ¿Qué es la memoization?

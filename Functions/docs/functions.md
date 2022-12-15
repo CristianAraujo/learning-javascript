@@ -1239,3 +1239,50 @@ let stddev = sqrt(product(reduce(map(data,
 ```
 
 Este calculo esta completamente hecho con invocación de funciones, no hay operadores envueltos.
+
+### Memoization
+
+Anteriormente se ha definido una función que cacheaba resultados parciales. Esto en programación funcional se llama `memoization`.
+
+Por ejemplo, en el siguente código, la función de alto nivel `memoize()`, acepta una función como su argumento y retorna una versión memoizada de esta:
+
+```js
+function memoize(f) {
+    const cache = new Map();
+     return function(...args) {
+
+        let key = args.length + args.join("+");
+        if (cache.has(key)) {
+            return cache.get(key);
+        } else {
+            let result = f.apply(this, args);
+            cache.set(key, result);
+            return result;
+        }
+     };
+}
+
+
+function gcd(a, bb) {
+    if (a < b){ [a, b] = [b, a]; }
+    while(b !== 0){
+        [a, b] = [b, a % b];
+    }
+    return a;
+}
+
+const gcdmemo = memoize(gdc);
+
+// Resultado 17
+gcdmemo(85, 187);
+```
+
+Debemos notar que cuando escribimos una función que será memoizada, tipicamente querremos usar la versión memoizada no la original.
+
+```js
+const factorial = memoize(function(n) {
+    return (n <= 1) ? 1 : n * factorial(n - 1);
+});
+
+factorial(5);
+```
