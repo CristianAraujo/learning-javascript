@@ -1048,3 +1048,194 @@ function constructFunction() {
 // Al llamar a constructFunction, esta nos devuelve la función que se crea en su interior, pero al ser esta última creada con el constructor Function(), es elevada como una 'top-level-function', por lo que su variable scope toma el ámbito global y no el ámbito de función.
 constructFunction()();
 ```
+
+## Programación functional
+
+JavaScript no es un lenguaje puramente funcional como lo son `Lisp` o `Haskell`, pero nos permite manipular funciones como objetos, por lo que podemos usar algunas técnicas de programación funcional en JavaScript.
+
+### Procesar arrays con funciones
+
+Tenemos el siguiente ejemplo. Spongamos que tenemos un array de numeros y queremos  calcular la m edia y la desviación estándar. Podríamos hacer lo siguiente:
+
+```js
+let data = [1,1,3,5,5];
+
+// La media es la suma de los elementos divida por el número de elementos
+let total = 0;
+for (let i = 0; i < data.length; i++) { total += data[i]; }
+
+// Se calcula la media
+let mean = total / data.length;
+
+// Para calcular la desviación estandar primero se suman los cuadrados de las desviaciones de cada elemento.
+
+total = 0;
+for (let i = 0; i < data.length; i++) {
+    // La variable deviation debe ser definida dentro del bucle ya que cada elemento tiene su propia desviación.
+    let deviation = data[i] - mean;
+    total += deviation * deviation;
+}
+
+let stddev = Math.sqrt(total / (data.length - 1));
+```
+
+Es posible hacer estos cálculos de manera más concisa usando el estilo funcional con los métodos `map()` y `reduce()`.
+
+```js
+const sum = (x, y) => x + y;
+const square = x => x * x;
+
+// Usamos las funcioones sum y square para calcular la media y la desviación estándar
+let data = [1,1,3,5,5];
+let mean = data.reduce(sum) / data.length;
+let deviations = data.map(x => x - mean);
+let stddev = Math.sqrt(deviations.map(square).reduce(sum) / (data.legth - 1));
+console.log(stddev);
+```
+
+La versión anterior aún invoca métodos en objetos, por lo que tiene algo de convenciones de la orientación a objetos, se puede aun hacerla más funcional. Se escribiran versiones funcionales de los métodos `map()` y `reduce()`.
+
+```js
+const map = function(a, ...args) { return a.map(...args); };
+const reduce = function(a, ...args) { return a.reduce(...args); };
+
+const sum = (x, y) => x + y;
+const square = x => x * x;
+
+let data = [1,1,3,5,5];
+let mean = reduce(data, sum) / data.length;
+let deviations = map(data, x => x - mean);
+let stddev = Math.sqrt(reduce(map(deviations, square), sum) / (data.length - 1));
+console.log(stddev);
+
+```
+
+### Funciones de alto nivel (Higher-order functions)
+
+Una función de alto nivel es una función que opera con funciones, tomando una o más funciones como argumentos y retornando una nueva función. Por ejemplo:
+
+```js
+function not(f) {
+    return function(...args) {
+        let result = f.apply(this, args);
+        return !result;
+    };
+}
+
+const even = x => x % 2 === 0;
+const odd = not(even);
+[1,1,3,5,5].every(odd);
+```
+
+En el siguiente ejemplo, considerar la función `mapper()` que toma una función como argumento, y retorna una nueva función que mapea una array a otro usando esa función:
+
+```js
+function mapper(f) {
+    return a => map(a, f);
+}
+
+const increment = x => x + 1;
+const incrementAll = mapper(increment);
+incrementAll([1,2,3]);
+```
+
+En el siguiente ejemplo, se creará una función que tome dos funciones como argumentos y que retorne uan nueva función que calcule f(g()).
+
+```js
+function compose(f, g) {
+    return function(...args) {
+        return f.call(this, g.apply(this, args));
+    };
+}
+
+const sum = (x, y) => x + y;
+const square = x => x * x;
+compose(square, sum) (2, 3);
+```
+
+### Aplicaciones parciales de funciones
+
+el método `bind()` aplica parcialmente los argumentos que se le son pasados como argumentos de la función a la izquierda de la lista de argumentos de la función original, pero tambien es posible aplicar los argumentos parcialmente a la derecha:
+
+```js
+// Los argumentos pasados a la siguiente función son aplicados parcialmente a la izquierda.
+function partialLeft(f, ...outerArgs) {
+    return function(...innerArgs) {
+        let args = [...outerArgs, ...innerArgs];
+        return f.apply(this, args);
+    };
+}
+
+// Los argumentos para esta función son pasados en la derecha.
+function partialRight(f, ...outerArgs) {
+    return function(...innerArgs) {
+        let args = [...innerArgs, ...outerArgs];
+        return f.apply(this.args);
+    };
+}
+
+// Los argumentos en esta función sirven como una plantilla. Los valores undefined en la lista de argumentos son llenados con valores del set interior.
+function partial(f, ...outerArgs) {
+    return function(...innerArgs) {
+        let args = [...outerArgs];
+        let innerIndex = 0;
+        for (let i = 0; i < args.length; i++) {
+            if (args[i] === undefined) {
+                args[i] = innerArgs[innerIndex++];
+            }
+        }
+        args.push(...innerArgs.slice(innerIndex));
+        return f.apply(this, args);
+    };
+}
+
+const f = function(x, y, z) { return x * ( y - z ); };
+
+// Resultado: -2: 2 * (3 - 4)
+partialLeft(f, 2)(3, 4);
+
+// Resultado: 6: 3 * (4 - 2)
+partialRight(f, 2)(3, 4);
+
+// Resultado: -6: 3 * (2 - 4)
+partial(f, undefined, 2)(3, 4);
+```
+
+Las últimas aplicaciones parciales de funciones nos permite dedinir interesantes funciones fuera de las que fueron definidas.
+
+```js
+const increment = partialLeft(sum, 1);
+const cuberoot = partialRight(Math.pow, 1 / 3);
+cuberoot(increment(26))
+```
+
+Tambien podemos combinar aplicaciones parciales con otras funciones de alto nivel (higher-order functions).
+
+```js
+const not = partialLeft(compose, x => !x);
+const even = x => x % 2 === 0;
+const odd = not(even);;
+const isNumber = not(isNaN);
+
+// Resultado: true
+odd(3) && isNumberr(2)
+```
+
+También podemos usar la composición y las aplicaciones parciales para redefinir los ejemplos previos para el cálculo de la media y la desviación estándar en un estilo funcional extremo.
+
+```js
+const product = (x, y) => x * y;
+const neg = partial(product, -1);
+const sqrt = partial(Math.pow, undefined, 0.5);
+const reciprocal = partial(Math.pow, undefined, neg(1));
+
+let data = [1,1,3,5,5]; // Our data
+let mean = product(reduce(data, sum), reciprocal(data.length));
+let stddev = sqrt(product(reduce(map(data,
+             compose(square, partial(sum, neg(mean)))), sum),
+             reciprocal(sum(data.length,neg(1)))));
+
+[mean, stddev] // => [3, 2]
+```
+
+Este calculo esta completamente hecho con invocación de funciones, no hay operadores envueltos.
