@@ -131,7 +131,7 @@ const h = x => { value: x };
 const i = x => { v: x, w: x }; 
 ```
 
-Una particularidad es que **las funciones flecha heredan el valor de this desde el ámbito en cual ellas son definidas** no desde cual son llamadas. Además, no tienen una propiedad `prototype, por lo que no puede ser usadas como funciones constructoras para clases.
+Una particularidad es que **las funciones flecha heredan el valor de this desde el ámbito en cual ellas son definidas** no desde cual son llamadas. Además, no tienen una propiedad `prototype`, por lo que no puede ser usadas como funciones constructoras para clases.
 
 La sintaxis consisa de las funciones flecha las hace ideales para pasarlas como parámetros a otras funciones:
 
