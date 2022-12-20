@@ -9,3 +9,6 @@
 7. ¿Que pasa si se declaran campos en el cuerpo de una clase fuera de cualquier método?
 8. Los campos declarados directamente en el cuerpo de una clase, pueden usar `this`?
 9. ¿Cuál es la diferencia entre escribir los campos dentro del constructor y fuera del constructor?
+10. ¿En una clase puede haber más de un constructor en JavaScript? ¿Existe sobrecarga de constructores?
+11. ¿Es posible crear getters y setters sin la palabra clave set o get?
+12. En JavaScript ¿Existe la herencia múltiple?
