@@ -237,7 +237,7 @@ No es posible exportar desde dentro de una clase, función, bucle, o condicional
 
 ### ES6 Imports
 
-Es posible impoprtar valores que fueron exportados por otro módulo con la palabra clase `import`.
+Es posible importar valores que fueron exportados por otro módulo con la palabra clase `import`.
 
 ```js
 import BitSet from './bitset.js';
