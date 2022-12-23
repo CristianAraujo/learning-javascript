@@ -19,7 +19,7 @@
 1. ¿Qué es necesario para convertir un script en un módulo? Explicar.
 2. Dar un ejemplo de un módulo creado con la técnica de modularidad automática basada en closures.
 3. Dar un ejemplo de uso de un módulo creado con la técnica de modularidad automática basada en closures.
-   
+
 ## Modulos en Node
 
 1. ¿Cómo se importan los módulos de Node? Explicar
