@@ -430,7 +430,7 @@ Estos métodos aceptan una función como su primer argumento, e invocan esa func
 
 Algunos de estos métodos también aceptan un segundo argumento opcional. Si es especificado la función es invocada como si fuera un método de este segundo argumento. Esto es, el segundo argumento que sea pasado será el valor de `this` para la función.
 
-Cabe mencionar que la mayoría de los casos, la funcnión que se pasa como primer argumento de estos métodos es invocada con tres argumentos: el valor del elemento del array, el índice el elemento del array y el array en si mismo. A menudo solo es necesario indicar el primero de estos y es posible ingnorar el resto.
+Cabe mencionar que la mayoría de los casos, la función que se pasa como primer argumento de estos métodos es invocada con tres argumentos: el valor del elemento del array, el índice el elemento del array y el array en si mismo. A menudo solo es necesario indicar el primero de estos y es posible ingnorar el resto.
 
 **forEach()**  
 El método `forEach()` itera a través de un array, invocando la función que se especifica para cada elemento. `forEach()` invoca la función con tres argumentos: el valor del elemento, el indice del elemento, y el array en si mismo.
@@ -532,7 +532,7 @@ Tanto `some()` como `every()` paran de iterar tan pronto como saben que valor de
 Por convención matemática, `every()`retorna `true` y `some()` retorna `false` cuando son invocados en un array vacío.
 
 **Reduce() y reduceRigth()**  
-Ambos métodos combinan los elementos de una array usando la función que se especifica para producir un único valor. `reduce()` recibe dos argumentos, el primero es la función que realiza los calculos, y el segundo y opcional, es un valor inicial para pasar a la función.
+Ambos métodos combinan los elementos de una array usando la función que se especifica para producir un único valor. `reduce()` recibe dos argumentos, el primero es la función que realiza los cálculos, y el segundo y opcional, es un valor inicial para pasar a la función.
 
 ```js
 // Se crea un array con 5 elementos
@@ -556,3 +556,526 @@ a.reduce((x,y) => x * y, 1);
 // 3 y así. La función retornará 5.
 a.reduce((x,y) => (x > y) ? x : y);
 ```
+
+`reduce()` toma dos argumentos. El primero es la función que realiza la reducción. La tarea de esa función es de alguna manera combinar dos valores en uno, retornando el valor reducido. El segundo arugmento (opcional) es un valor inicial que se le pasa a la función.
+
+Las funciones usadas con `recude()` son diferentes a las funciones usadas con `forEach()` o `map()`. los valores como el valor inicial, índice, el array; son pasados como el segundo, tercer y cuardo elemento.
+
+Cuando se llama a `reduce()` sin un valor inicial pasado, la función usa el primer elemento del array como su valor inicial. Esto significa que la primera llamada de la función, esta tomará el prmer y el segundo valor del array como su primer y segundo argumento.
+
+Cuando `reduce()` es llamada en un array vacío sin un valor inicial, esto causa un `TypeError`.
+
+**ReduceRigth()**  
+`reduceRigth()` trabaja exactamente igual que `reduce()`, pero comienza a procesar el array desde el índice mayor hasta el menor. Esto es preferible cuando la asociatividad de la operación es de derecha a izquierda.
+
+```js
+let a = [2, 3, 4];
+a.reduceRight((acc, val) => Math.pow(val, acc));
+```
+
+Ni `reduce()` ni `reduceRight()` aceptan algun argumento que especifique el valor para `this` en el cual la función será invocada.
+
+`reduce()` y `reduceRight()` no solo pueden ser usadas para cálculos matemáticos. Cualquier función que pueda combiar dos valores, puede ser usada como función de reducción.
+
+### Simplificando arrays con `flat()` y `flatMap()`
+
+En ES2019, `flat()` crea y retorna un nuevo array que contiene los mismos elementos que el array llamado, excepto que algunos elementos los cuales ellos mismos son arrays, estos son simplificados en elementos individuales dentro del array retornado. Por ejemplo:
+
+```js
+// Devuelve: [1, 2, 3]
+// Se simplifica el array interrior, devolviendo sus elementos
+// como elementos simples.
+[1, [2, 3]].flat()
+
+// Esto devuelve [1, 2, [3]].
+// Se simplifica el array con menos profundidad devolviendolo 
+// dentro del array retornado como elemento simple
+[1, [2,[3]]].flat()
+```
+
+Se se pasa a `flat()` un argumento numérico, este indicará el nivel de anidamiento en el cual se simplificarán los elementos.
+
+```js
+let a = [1, [2, [3, [4]]]];
+
+// Devuelve: [1, [2, 3 [4]]]
+// Se simplifica el primer nivel de anidamiento
+a.flat(1) 
+
+// Devuelve [1, 2, 3, [4]]
+// Se simplifican hasta dos niveles de anidamiento
+a.flat(2) 
+
+// Devuelve [1, 2, 3, 4]
+// Se simplifican hasta 3 niveles de anidamimento
+a.flat(3) 
+
+// Devuelve [1, 2, 3, 4]
+// Se simplifican hasta 4 niveles de anidamiento
+// ya que solo hay tres niveles de anidamiento se simplifican
+// todos
+a.flat(4) 
+```
+
+**`flatMap()`**  
+`flatMap()` trabaja como  una combinación de `flat()` y `map()` el array retornado por la función `map()` es automaticamente pasado a una función `flat()` para ser simplificado. Es similara realizar `map(f).flat()`.
+
+```js
+let phrases = ["hello world", "the definitive  guide"];
+
+// phrase.map() devuelve: 
+// [["hello", "world"], ["the", "definitive", "guide"]]
+// Luego a pasar el resultado anterior a flat() se tiene:
+// ["hello", "world", "the", "definitive", "guide"]
+let words = phrases.flatMap(phrase => phrase.split(" "));
+
+// Imprime ["hello", "world", "the", "definitive", "guide"]
+console.log(words);
+```
+
+Describir el siguiente ejemplo:
+
+```js
+[-2, -1, 1, 2].flatMap(x => x < 0 ? [] : Math.sqrt(x))
+```
+
+### Añadiendo arrays con `concat()`
+
+El método `contact()` crea y devuelve un nuevo array que contiene los elementos originales, seguidos de los argumentos añadidos con `concat()`. Si los elementos que se añaden son arrays en si mismos, se añaden los elementos de estos arrays como elementos individuales, no como arrays. Solo se conservan como elementos los arrays anidados.
+
+```js
+// Se crea un array de elementos númericos
+let a = [1, 2, 3];
+
+// Se añade al array a los elementos 4 y 5
+// [1, 2, 3, 4, 5]
+a.concat(4, 5);
+
+// [1, 2, 3, 4, 5, 6, 7]
+a.concat([4, 5], [6, 7]);
+
+// [1, 2, 3, 4, 5, [6, 7]]
+a.concat(4, [5, [6, 7]]);
+
+// Devuelve [1, 2, 3] ya que array original no es modificado
+console.log(a);
+```
+
+Notar que `contact()` crea un nuevo array. Si te encuentras escribiendo codigo como `a = a.concat(x)`, entonces se debería pensar en modificar el array original en su lugar con `push()` o `splice()`.
+
+### Métodos de pilas y colas con `push()`, `pop()`, `shift()` y `unshit()`
+
+**push() y pop()**  
+Los métodos `push()` y `pop()` nos permiten trabajar con arrays como si fueran pilas. `push()` agrega uno o más elementos al final del array y devuelve la nueva longitud del arrray. `push()` no simpifica sus argumentos.
+
+`pop()` borra el último elemento del array, decrementando el valor de `length` y retornando el valor removido.
+
+Tanto `push()` como `pop()` modifican el array original en su lugar.
+
+```js
+let stack = [];
+stack.push(1, 2);
+stack.pop();
+stack.push(3);
+stack.pop();
+stack.push([4, 5]);
+stack.pop();
+stack.pop();
+```
+
+**unshift y shift**  
+Estos métodos insertan y remueven elementos desde el inicio de un array. `unshift()` añade un elemento al inicio, aumenta el valor de los índices de todos los elementos presentes y retorna la nueva longitud del array. `shift()` remueve y retorna el primer elemento del array, disminuyento el índice de todos los elementos precentes. Estos métodos son menos eficientes que `push` y `pop()` ya que deben trabajar reubicando todos los elementos del array en cada operación.
+
+```js
+let a = [];
+q.push(1, 2);
+q.shift();
+q.push(3);
+q.shift();
+q.shift();
+```
+
+Cuando se psadan múltiples elementos a `unshift()` estos son insertados todos a la vez, por lo que el resultado es diferente que cuando son insertados individualamente:
+
+```js
+// Array  a es []
+let a = [];
+
+// Array a es [1]
+a.unshift(1)
+
+// Array a es [2]
+a.unshift(2)
+
+// Array es []
+a = [];
+
+// Array a es [1, 2]
+// Los elementos se insertan en el mismo orden en el cual son 
+// recibidos como argumentos, por lo que el resultado es distinto
+// al obtendo cuando se insertan separadamente ya que en este último
+// caso el último elemento insertado siempre se colocará primero
+a.unshift(1, 2);
+```
+
+### Subarrays con `slice()`, `splice()`, `fill()` y `copyWithin()`
+
+**slice**  
+El método `slice()` retorna un slice o subarray del array especificado. Toma dos argumentos que especifican el comienzo y el final del slice retornado, sin incluir el segundo argumento.
+
+- Si se llama slice con solo con 1 argumento, el array retornado contendrá todos los elelementos desde la posición inicial indicada hasta la final.
+- Si algún argumento es negativo, este se referería a posicions relativas al final del array.
+- Slice no modifica el array original
+
+```js
+let a = [1, 2, 3, 4, 5];
+
+// Devuelve: [1, 2, 3]
+// Los elementos 0 al 3 con desde el valor 1 al 4, pero un slice
+// no incluye el valor final
+a.slice(0, 3);
+
+// Devuelve: [4, 5]
+// Solo se indica que se comience en el elemento indice 3, como
+// no se indica final, se tomará desde el índice 3 hasta el final
+a.slice(3)
+
+// Devuelve: [2, 3, 4]
+// El inicio es el elemento índice 1, mientras que el final será 
+// el último elemento, ya que -1 hace referencia al último elemento
+// El último elemento no se incluye
+a.slice(1, -1)
+
+// Devuelve: [3]
+// El inicio es relativo al final por lo que el índice -3 corresponde
+// al valor -3. El final del índice -2 sería el valor 4, pero
+// no se incluye
+a.slice(-3, -2)
+```
+
+**splice**  
+`splice()` es un método de próposito general, modifica el array original. `splice()` puede borrar elementos de un array, insertar elementos de un array o hacer ambas al mismo tiempo. Los elementos que vienen antes o después de la operación ven sus índices decrementados o aumentados si es necesario.
+
+El primer argumento para `splice()` especifica la posición del array donde se comenzará la inserción o eliminación. El segundo argumento, especificará el número de elementos que deben ser borrados desde el array. Si el segundo argumento es omitido se eliminarán todos los elementos del arrays desde el inicio indicado. `splice()` devolverá un array con los elementos borrados o un array vacío si no ningun elemento fue borrado.
+
+```js
+let a = [1, 2, 3, 4, 5, 6, 7, 8];
+
+// devuelve [5, 6, 7, 8], los cuales son los elementos borrados
+// desde el índice 4 hasta el final
+// el array a ahora es: [1, 2, 3, 4]
+a.splice(4);
+
+// Devuelve: [2, 3]
+// El array a ahora es: [1, 4]
+a.splice(1,2);
+
+// Devuelve: [4]
+// El array a ahora vale [1]
+a.splice(1,1)
+```
+
+`splice()` puede recibir otros argumentos que indican los elementos que deben ser insertados en el array, comenzando de la posición indicada en el primer argumento. Por ejemplo:
+
+```js
+let a = [1, 2, 3, 4, 5];
+
+// a es: [1, 2, "a", "b", 3, 4, 5]
+// La posición inicial de la inserción es el índice 2. Todos
+// los elementos desde el índice 2 en adelante se incrementan en
+// índice.
+// el segundo argumento 0 indica que 0 elementos deben borrarse
+// luego desde el tercer argumento tenemos los elementos a insertar
+// en el array
+a.splice(2, 0, "a", "b");
+
+// Devuelve: [1, 2, [1, 2], 3, 3, 5]
+// el primer argumento indica que se deben comenzar a borrar elementos
+// desde el índice 2. El segundo argumento que se deben borrar
+// 2 elementos. Luego de eso debenn insertarse los elementos
+// pasados como argumentos restantes
+a.splice(2, 2, [1, 2], 3);
+```
+
+**fill()**  
+Configura elementos de una array, o dividisión de un array, a un valor especificado. Modifica el array original y lo retorna.
+
+El primer argumento de `fill()` es el valor con el cual el array será configurado, el segundo argumento (opcional) especifica el inicio, si se omite el inicio será el comienzo. El tercer argumento especifica el índice final, sin incluir el final.
+
+```js
+// Se crea un array con 5 posiciones vacias
+let a = new Array(5);
+
+// Se llena el array a con solo 0
+// a [0, 0, 0, 0, 0]
+a.fill(0)
+
+// Se llena el array con valores 9 desde la posición 1
+// a [0, 9, 9, 9, 9]
+a.fill(9, 1)
+
+// Se llena el array con valores 8 desde la posición 2 hasta
+// la posición -1
+// a [0, 9, 8, 8, 9]
+a.fill(8, 2, -1)
+```
+
+**copyWithin**  
+Copia una división del array a una nueva posición dentro del mismo array. El primer argumento especifica el índice de destino, el segundo argumento especifica el índice del primer elemento que será copiado, si es omitido es usado 0. El tercer argumento especifica el final de la división de elementos que serán copiados, si se omite, la longitud del array es usada. No se incluye el elemento final en la copia.
+
+```js
+let a = [1, 2, 3, 4, 5];
+
+// Copia a la posición 1 usando todo el array
+// a [1, 1, 2, 3, 4]
+a.copyWhitin(1);
+
+// Copia a la posición 2 un los elementos comprendidos entre el
+// índice 3 y el 5. Cómo el array tiene indices desde 0 a 4, se 
+// copian los dos últimos elementos a la posición 2
+// a [1, 1, 3, 4, 4]
+a.copyWhitin(2, 3, 5);
+
+// Se copina a la posición 0, desde el índice -2 hasta el final
+// a [4, 4, 3, 4, 4]
+a.copyWhitin(0, -2)
+```
+
+### Métodos de orden y búsqueda en arrays
+
+**indexof() y lastIndexOf()**  
+`indexOf()` y `lastIndexOf()` buscan en un array la aparición de un valor especificado y retornan el índice de la primera coincidencia o -1 en el caso de no encontrarse. `indexOf()` busca desde el inicio hasta el final del array, mientras que `lastIndexOf()` busca desde el final al inicio.
+
+```js
+let a = [0, 1, 2, 1, 0];
+
+// Retorna 1, ya que 1 es el índice de la primera aparición de 1
+// buscando de izquierda a derecha
+a.indexOf(1);
+
+// Retorna 3, ya que 3 es el índice de la primera aparición de 1
+// buscando de derecha a izquierda
+a.lastIndex(1);
+
+// Retorna -1, ya que no hay coincidencias para el valor 3
+a.indexOf(3);
+```
+
+Estas funciones comparan su argumento con los valores del array mediante el operador de equivalencia `===`. Si array contiene objetos u otros arrays, en lugar de valores primitivos, serán comparadas sus referencias. Si se desea comparar el contenido de un objeto, es mejor usar `find()`.
+
+`indexOf()` y `lastIndexOf()`, toman un segundo argumento, que especifica el índice desde donde comenzar la búsqueda. Si este argumento es omitido `indexOf()` comienza la búsqueda al inico del array y `lastIndexOf()` al final.
+
+Los índices negativos son permitidos, y son tratados como un desplazamiento respecto al final del array.
+
+En el siguiente ejemplo, se tiene una función que busca un elemento especificado en un array y retorna un array con todas las considencias.
+
+```js
+function findall(a, x) {
+    let results = [], len = a.length, pos = 0;
+
+    while(pos < len) {
+        pos = a.indexOf(x, pos);
+        if (pos === -1) break;
+        results.push(pos);
+        pos = pos + 1;
+    }
+    return results;
+}
+```
+
+**Includes**  
+`sort()` ordena los elementos de un array en el array original y retorna el array ordenado. Cuando este métodod es llamado sin argumentos, ordena los elementos de una array de manera alfabetica (covierte los elementos temporalmente si es necesario).
+
+```js
+let a = ["banana", "cherry", "apple"];
+
+// Devuelve: ["apple", "banana", "cherry"]
+a.sort();
+```
+
+Si un array contiene elementos `undefined` estos son ordenados al final del array.
+
+Para ordenar un array en un orden particular, se debe pasar una función de comparación como un argumento de `sort()`. Si en la comparación, el primer argumento debe aparecer primero, la función debe retornar un valor menor que 0, si el  primer argumeto debe aparecer segundo la función debe retornar un valor menor a 0, si ambos valores son equivalentes la función debe retornar 0, en este caso el orden es irrelevante.
+
+Por ejemplo:
+
+```js
+let a = [33, 4, 1111, 222];
+
+// Devuelve el orden alfabetico
+// [1111, 222, 33, 4]
+a.sort();
+
+// Retorna los valores ordenados numéricamente
+// [4, 33, 222, 1111]
+a.sort(function (a, b) {
+    return a - b;
+});
+
+// Retorna los valores ordenados de manera inversa
+// [1111, 222, 33, 4]
+a.sort((a, b) => b - a);
+```
+
+Otro ejemplo, comparación de elementos de texto sin sensibilidad a mayúculas.
+
+```js
+let a = ["ant", "Bug", "cat", "Dog"];
+
+// a == ["Bug", "Dog", "ant", "cat"]; 
+// Orden sencible a mayúsculas
+a.sort();
+
+a.sort(function(s, t) {
+    let a = s.toLowerCase();
+    let b = t.toLowerCase();
+    if (a > b) return -1;
+    if (b > a) return 1;
+    return 0;
+});
+```
+
+**Reverse**  
+El método `reverse()` invierte el orden de los elementos de un array y retorna el array resultante. Las operaciones son realizadas en el array de origen.
+
+```js
+let a = [1, 2, 3];
+a.reverse();
+```
+
+### Conversiones de Array a string
+
+La clase Array define tres métodos para convertir de arrays a strings (si se desea guardar contenido de un array en forma de texto para volver a usarlo después, es mejor serialzar el array con `JSON.stringifu()`).
+
+**join()**  
+El método `join()` convierte todos los elementos de un array a un string que los concatena y retorna el array resultante. Es posible especificar un string que separe los elmentos como argumento de `join()`. Si nada es especificado, se usarán comas.
+
+```js
+let a = [1, 2, 3];
+
+// "1,2,3"
+a.join();
+
+// "1 2 3"
+a.join(" ");
+
+// "123"
+a.join("");
+
+// Se crea una array con 10 elementos vacios
+let b = new Array(10);
+
+// El resultado es "----------"
+b.join("-");
+```
+
+**toString()**  
+Como todos los objetos, los arrays tienen el método `toString()` que funciona como `join()` sin argumntos,
+
+```js
+// "1,2,3"
+[1,2,3].toString()
+
+// "a,b,c
+["a", "b", "c"].toString()
+```
+
+Además `toLocaleString()` es la versión de `toString()` localizada. Concatena los elementos el array según la configuración de localización específica.
+
+#### Funciones estáticas de arrays
+
+La clase Array define tres funciones estáticas para los arrays, las que se pueden invocar por medio del constructor array.
+
+`Array.of` y `Array.from` son métodos que crean nuevos arrays ya documentados anteriormente. el tercer método es `Array.isArray(), es cual es usado para determinar cuando un valor es array o no.
+
+```js
+// true
+Array.isArray([])
+
+// false
+Array.isArray({})
+```
+
+## Objetos Array-like
+
+Los objetos `array-like` no son en realidad arrays, pero en la practica, aunque no se puedan invocar directamente métodos de arrays en ellos, es posible iterar sobre sus valores con el mismo código que se haria para un verdadero array. Esto es espcialmente verdadero cuando los algoritmos tratan a los arrays como solo lectura o si ellos al menos dejan la propiedad `length` sin cambios.
+
+El siguiente código toma un objeto reglar, añade propiedades para convertirlo en un `array-like` y luego iterar a través de sus elementos.
+
+```js
+let a = {}
+let i = 0;
+while (i < 10) {
+    a[i] = i * i;
+    i++;
+}
+
+a.length = i;
+
+let total = 0;
+for(let j = 0; j < a.length; j++) {
+    total += a[j];
+}
+```
+
+En JavaScript del lado del cliente, un número de métodos para trabajar con documentos HTML retornan objetos `array-like`. El siguiente ejemplo es una función que se puede usar para probar objetos que trabajen como arrays:
+
+```js
+function isArrayLike(o) {
+    if(o &&
+       typeof o === "object" &&
+       Number.isFinite(o.length) &&
+       o.length >= 0 &&
+       Number.isInteger(o.length) &&
+       o.length < 4294967295) {
+        return true;
+       } else {
+        return false;
+       }
+}
+```
+
+La mayoria de los métodos de arrays son definidos de manera genérica asi estos estos puede ser correctamente aplicados en objetos `array-like`.
+
+Es posible invocar métodos de arrays usando `Function.call`.
+
+```js
+// Se crea un objeto array-like
+let a = {"0": "a", "1": "b", "2": "c", length: 3}
+
+// Se llama el método join desde la clase Array pasándole como
+// this el objeto a y como separador +
+// "a+b+c"
+Array.prototype.join.call(a, "+");
+
+// Se llama el método map de la clase array
+Array.prototype.map.call(a, x => x.toUpperCase());
+
+Array.prototype.slice.call(a, 0);
+
+// Se crea un nuevo array desde el objeto a
+Array.from(a)
+```
+
+## String como Arrays
+
+Los strings en JavaScript se comportan como arrays de solo lectura de caracteres UTF-16 Unicode. Es posible acceder a los elementos de un string mediante la notación de corchetes.
+
+```js
+let s = "test";
+
+// => "t"
+s.chartAt(0);
+
+// => "e"
+s[1]
+```
+
+Esto significa que podemos aplicar métodos genéricos de los arrays sobre los strings.
+
+```js
+// => "J a v a S c r i p t"
+Array.prototype.join.call("JavaScript", " ")
+```
+
+Los strings son valores inmutables, por loque son tratados como arrays de solo lecturaa. Los métodos como `push()`, `sort()`, `reverse()` y `splice()` no funcionan en strings. Esto no causa un error, solo falla de manera silenciosa.
