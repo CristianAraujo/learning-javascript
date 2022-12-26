@@ -127,7 +127,7 @@ let a = new Array(5, 4, 3, 2, 1, 'testing, testing');
 
 ### Array.of()
 
-El constructor Array() no puede ser usado para crear un array con un solo argumento numérico. En ES6, `Array.of()` crea y retornra un nuevo array usando sus argumentos como valores, sin importar cuantos argumentos sean.
+El constructor Array() no puede ser usado para crear un array con un solo argumento numérico. En ES6, `Array.of()` crea y retorna un nuevo array usando sus argumentos como valores, sin importar cuantos argumentos sean.
 
 ```js
 Array.of()
@@ -137,7 +137,7 @@ Array.of(1,2,3)
 
 ### Array.from()
 
-Es otro método para la creación de arrays introducido en ES6. Espera un iterable o un `array-like` comom primer argumento y retorna un nuevo array que contiene los elementos del objeto.
+Es otro método para la creación de arrays introducido en ES6. Espera un iterable o un `array-like` como primer argumento y retorna un nuevo array que contiene los elementos del objeto.
 
 ```js
 let copy = Array.from(original);
@@ -186,7 +186,7 @@ o[1] = "one";
 o["1"];
 ```
 
-Es útil distringuir un índice de una array del nombre de una propiedad de un objeto. Todos los índices son nombres de propiedades, pero solo los nombres de propiedades que son enteros entre 0 y 2^32 - 2 son índices.
+Es útil distinguir un índice de una array del nombre de una propiedad de un objeto. Todos los índices son nombres de propiedades, pero solo los nombres de propiedades que son enteros entre 0 y 2^32 - 2 son índices.
 
 Es posible indexar un array usando números que son negativos o valores que no sean enteros. Cuando se hace esto, el número es convertido a string el cual es usado como nombre de la propiedad.
 
@@ -235,7 +235,7 @@ Cada array tiene la propiedad `length`, esta propiedad es la que hace a los arra
 ["a", "b", "c"].length
 ```
 
-En los arrays esparcidos, la propiedad `length` es más grandeque el número de elementos. Nunca tendremos un elemento cuyo índice sea mayor o igual que la propiedad `length` del array.
+En los arrays esparcidos, la propiedad `length` es más grande que el número de elementos. Nunca tendremos un elemento cuyo índice sea mayor o igual que la propiedad `length` del array.
 
 Si se asing un valor a un elemento de una array cuyo índice, es mayor o igual que el valor del `length`, entonces el valor de la propiedad `length` se actualizará para ser mayor que el valor índice del último elemento + 1.
 
@@ -310,7 +310,7 @@ delete a[2];
 a.length
 ```
 
-Borrar eleementos de un array es similar, pero levemente diferente, a asignar `undefined` a esos elementos. Notar que borrar elementos no afecta el valor de `length`.
+Borrar elementos de un array es similar, pero levemente diferente, a asignar `undefined` a esos elementos. Notar que borrar elementos no afecta el valor de `length`.
 
 `splice()` nos permite añadir, eliminar o reemplazar elementos de un array. Será visto en detalle más adelante.
 
@@ -356,7 +356,7 @@ letters.forEach(letter => {
 console.log(uppercase);
 ```
 
-`forEach()` itera en orden sobre el array y pasa como segundo argumento el índice el elemento a la función. Distinto a `for/of` cuano se eencuunetra con elementos cuyos valores no existen en el array, no se invoca la función.
+`forEach()` itera en orden sobre el array y pasa como segundo argumento el índice el elemento a la función. Distinto a `for/of` cuando se eencunetra con elementos cuyos valores no existen en el array, no se invoca la función.
 
 **Iteración con bucle for**  
 Es posible también iterar sobre un array de la manera clásica, usando el bucle `for`.
@@ -424,7 +424,7 @@ Es posible agrupar los métodos de los arrays en:
 - Subarray. Métodos para extraer, borrar, insertar, llenar y copiar.
 - Búsqueda y ordenamiento. Métodos para buscar elementos y ordenarlos en un array.
 
-## Métodos de iteración
+### Métodos de iteración
 
 Estos métodos aceptan una función como su primer argumento, e invocan esa función una vez cada elemento (o algunos elementos) del array.
 
@@ -459,7 +459,7 @@ let a = [1, 2, 3];
 let b = a.map(x => x * x);
 ```
 
-`map()` invoca la función que recibe como argumento de la misma manera que lo hace `forEach()`. Sin embargo la función que recibe `map()`debe retornar un valor.
+`map()` invoca la función que recibe como argumento de la misma manera que lo hace `forEach()`. Sin embargo la función que recibe `map()` debe retornar un valor.
 
 `map()` retorna un array, no modifica el array en el cual fue invocado. El array retornado tiene la misma longitud que el array donde fue invocado y los mismos elementos vacíos.
 
@@ -475,7 +475,7 @@ a.filter((x, i) => i  % 2 === 0);
 `filter()` salta los elementos vacíos en un array y retorna una rray denso.
 
 **find() y findIndex()**  
-Son similares a `filter()` en el sentido de que reciven una función con un predicado y comienzan a iterar sobre cada elemento del array buscando que elementos cumplen con el predicado. Estos métodos paran la iteración la primera vez que un elemento cumple con el predicado. Cuando eso sucede `finds()` retorna el valor del elemento, mientras que `findIndex()` retorna el índice del elemento que cumplio el predicado. Si ningún elemento cumple el predicado, `find()` retorna `undefinded` y `findIndex()` retorna -1.
+Son similares a `filter()` en el sentido de que reciven una función con un predicado y comienzan a iterar sobre cada elemento del array buscando que elementos cumplen con el predicado. Estos métodos paran la iteración la primera vez que un elemento cumple con el predicado. Cuando eso sucede `find()` retorna el valor del elemento, mientras que `findIndex()` retorna el índice del elemento que cumplio el predicado. Si ningún elemento cumple el predicado, `find()` retorna `undefinded` y `findIndex()` retorna -1.
 
 ```js
 // Se crea un array con 5 elementos
@@ -666,7 +666,7 @@ Notar que `contact()` crea un nuevo array. Si te encuentras escribiendo codigo c
 ### Métodos de pilas y colas con `push()`, `pop()`, `shift()` y `unshit()`
 
 **push() y pop()**  
-Los métodos `push()` y `pop()` nos permiten trabajar con arrays como si fueran pilas. `push()` agrega uno o más elementos al final del array y devuelve la nueva longitud del arrray. `push()` no simpifica sus argumentos.
+Los métodos `push()` y `pop()` nos permiten trabajar con arrays como si fueran pilas. `push()` agrega uno o más elementos al final del array y devuelve la nueva longitud del array. `push()` no simplifica sus argumentos.
 
 `pop()` borra el último elemento del array, decrementando el valor de `length` y retornando el valor removido.
 
@@ -883,7 +883,20 @@ function findall(a, x) {
 }
 ```
 
-**Includes**  
+**includes()**  
+El método `includes()` agregado en ES2016 toma un solo argumento y retorna `true` si el array contiene el valor y falso de sino. No indica el valor del índice, solo la existencia.
+
+`includes()` usa una manera ligeramente distinta de igualdad, considerando `NaN` igual a si mismo. Lo anterior indica que por ejemplo `indexOf()` no detectaría un valor `NaN` mientras que `include()` lo haría.
+
+```js
+let a = [1, true, 3, NaN];
+a.includes(true);
+a.includes(2);
+a.includes(NaN);
+a.indexOf(NaN);
+```
+
+**sort()**  
 `sort()` ordena los elementos de un array en el array original y retorna el array ordenado. Cuando este métodod es llamado sin argumentos, ordena los elementos de una array de manera alfabetica (covierte los elementos temporalmente si es necesario).
 
 ```js
