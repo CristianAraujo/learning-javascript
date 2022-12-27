@@ -265,3 +265,208 @@ Puede parecer extraño que el primer parámetro sea `value` y el segundo sea `ke
 
 **WeakMaps**  
 Los `WeakMaps` son una clase que es una variante, pero no una subclase de `Map`.
+
+## Fechas y horas
+
+La clase `Date` es una `API` de JavaScript que trabaja con fechas y horas. Se puede crear un objeto `Date` mediante su constructor `Date()`. Sin argumentos, este retorna un objeto `Date` que representa la fecha y hora actual. Si se pasa un argumento con valor numérico, el constructor `Date()` interpreta ese valor como el número de milisegundos trascurridos desde el 1 de enero de 1970.
+
+```js
+// Se crea un objeto Date que representa la fecha actual
+let now = new Date();
+
+// Se pasa como argumento 0, por lo cual debe devolver el 1 de
+// enero de 1970 a las 00 hrs ya que 0 indica la cantidad de 
+// milisegundos transcurridos desde esa fecha
+let epoch = new Date(0); 
+```
+
+Si se especifican dos o más argumentos de enteros, estos son interpretados como año, mes, day del mes, hora, minuto, segundo y milisegundo en hora local. Por ejemplo:
+
+```js
+let century = new Date(
+    2100, 0, 1, 2, 3, 5, 2
+);
+```
+
+Los meses del año comienzan en 0, por lo que enero corresponde a 0.  Si se omiten los campos de hora en el constructor, estos se llenan por defecto con valores 0, configurando la media noche.
+
+Si se desea especificar una fecha y hora en UTC (Universal Coordinated Time, aka GMT), entonces se puede usar `Date.UTC()`. Este es un método estático que toma los mismos argumentos que el constructor `Date()`, interpretándolos en tiempo UTC, y retornando un `timestamp`en milisegundos el cual se puede pasar al constructor `Date()`. Por ejemplo:
+
+```js
+let century = new Date(Date.UTC(2100, 0, 1));
+```
+
+Si desea imprimir una fecha, esta por defecto será imprimida en la zona de hora local. Si se desea mostrar una fecha en UTC, entonces se debe explicitamente convcertir a string con `toUTCString()` o `toISOString()`.
+
+Finalmente, si e pasa un strong al constructor `Date()`, este intentará parsear el string como una especificación de fecha y hora. El constructor `Date()` puede parsear fechas especificadas en formatos producidos por `toString()`, `toUTCString()` y `toISOString()`. Por ejemplo:
+
+```js
+// Se le entrega a Date un string con el formato ISO por lo cual
+// este es capaz de interpretarlo correctamente y crear un 
+// objetot fecha.
+let century = new Date("2100-01-01T00:000:00Z");
+```
+
+**Consultar y configurar objectos Date**  
+Una vez creado el objeto `Date` es posible consultar y configurar sus valores con los métodos setters y getters correspondientes. Cada método tiene dos formas: una que consulta y configura los valores usando el formato local y hora que usa el tiempo UTC.
+
+Para consultar y configurar los valores de un objeto `Date` tenemos por ejemplo tenemos: `getFullYear()`, `getUTCFullYear()`, `setFullYear()` o `setUTCFullYear()`.
+
+Para obtener y configurar los valores de los otros campos de `Date` simplemente se reemplaza por el nombre que deseamos, por ejemplo, si se desea el mes sería: `getFullMonth()`, `getUTCFullMonth()`, `setFullMonth()` o `setUTCFullMonth()`.
+
+Por ejemplo:
+
+```js
+// Se crea un nuevo objeto fecha, que almacenará la fecha actual
+let d = new Date();
+
+// Se configura el año del objeto fecha creado, obteniendo el
+// valor del año presente en el objeto, sumandole 1.
+d.setFullYear(d.getFullYear() + 1)
+```
+
+`setFullYear()` y `setUTCFull()` year también permiten configurar el és y el day del mes. `setHours()` y `setUTCHours()` permiten especificar los minutos, los segundos y los milisegundos.
+
+`getDay()` y `getUTCDay()` retornan el día de la semana (0 para los domingos y 6 para los sábados). El día de la semana es una propiedad de solo lectura, por lo que no existe un método correspondiente a setDay. `getDate()` y `getUTCDate()` retornan el día del mes.
+
+### Timestamps
+
+JavaScript representa las fechas internamente como enteros que especifican el número de milisegundos desde la media noche del 1 de enero del 1970, hora UTC.
+
+Para cualquier objeto `Date`, el método `getTime()` retorna este valor interno y `setTime()` lo configura. Así para añadir 30 segundo a una fecha podemos hacer lo siguiente:
+
+```js
+d.setTime(d.getTime() + 30000);
+```
+
+Estos valores en milisegundos son también llamados `timestamps`. El método estático `Date.now()` retorna el tiempo actual como `timestamp` y es útil por ejemplo cuando se desea medir cuando tarda un código en correr, por ejemplo:
+
+```js
+let starTime = Date.now();
+
+// Hacer algo que consuma tiempo 
+reticulateSplines();
+
+let endTime = Date.now();
+console.log(`La función ha tardado: ${statTime - endTime}`);
+```
+
+**High-Resolution Timestamps**  
+La función `performance.now()` retorna valores timestamp en miliegundos, pero los valores incluyen fracciones de milisegundos, por lo que es mucho más precisa.
+
+Está función es parte de la API `Performance` y no está definida por el estándar ECMAScript, aunque es implementada por los navegadores y Node. Para usar `performance` en Node se debe importar:
+
+```js
+const { performance } = require("perf_hooks");
+```
+
+### Aritmetica de fechas
+
+Es posible comprar fechasa con los operadores de comparación `<`, `>`, `<=`, `=>`, y además tambien se pueden sustraer objetos `Date` desde otro para determinar el número de milisegundos entre dos fechas. Esto es posible porque la clase `Date` define un método `valueOf()` que returna un `timestamp`.
+
+Para hacer aritmética que involucran días, meses y años, es posible usar `setDay()`, `setMonth()`, y `setYear()` ya que utilizar milisegundos para estas operaciones resulta engorroso. A continuación un ejemplo de como sumar tres meses y dods seamanas a la fecha actual:
+
+```js
+let d = new Date();
+d.setMonth(d.getMonth() + 3, d.getDate() + 14);
+```
+
+Los métodos de configuración de fechas funcionan correctamente, incluso cuando están fuera de rango. Cuando añadimos tres meses al mes actual, si terminamos con un valor mayor a 11 (el cual representa a diciemrbe). `setMonth()` maneja esto incrementando el año como sea necesario. Similarmente, cuando configuramos el dia del mes con un valor mayor al número de dias en el mes, el mes se incrementa apropiadamente.
+
+```js
+let fechaDiciemnbre = new Date(2022, 11, 27);
+let fechaPosterior = new Date(fechaDiciembre.getMonth() + 1);
+```
+
+### Formateando y Parsing fechas
+
+La clase `Date` define un número de diferentes métodos para convertir objetos `Date` en strings. Aquí algunos ejemplos:
+
+```js
+// Se crea un nuevo objeto tipo fecha año 2020, enero, dia 1,
+// 17:10:30 hora.
+let d = new Date(2020, 0, 1, 17, 10, 30);
+
+// Convertimos a string el objeto anterior
+// Wed Jan 01 2020 17:10:30 GMT-0300
+d.toString();
+
+// Wed, 01 Jan 2020 20:10:30 GMT
+d.toUTCString();
+
+// 01-01-2020
+d.toLocaleDateString();
+
+// 17:10:30
+d.toLocaleTimeString();
+
+// 2020-01-01T20:10:30.000Z
+d.toISOString();
+```
+
+Lista completa de métodos para formatear strings de fechas
+
+- `toString()`. Este método usa la hora looal, pero no entrega la información en el formato local.
+- `toUTCString()`. Este método usa el tiempo UTC, y no formatea la fecha en formato local.
+- `toISOString()`. Entrega la fecha y la hora en el formato IUSO-8601. horas:minutoss:segundos:ms. La letra T separa la fecha de la hora. Es expresado con la hora UTC indicada con la Z al final de la cadena.
+- `toLocaleString()`. Este método usa la hora local y el formaque es apropiado para el usario local.
+- `toDateString()`. Este método formatea solo la porción correspondiente a la fecha, omitiendo la hora. Usa la zona horaria local.
+- `toLocaleDateString()`. Formatea solo la fecha. Usa la zona horaria local y el formato apropiado para el usario local.
+- `toTimeString()`. Formatea solo la hora, omite la fecha. Usa la zona horaria local, pero no entrega un formato local.
+- `toLocaleTimeString()`. Formatea la hora en un formato local y usa la zona horaria local.
+
+```js
+let ahora = new Date();
+
+// Convertimos a string el objeto anterior
+console.log('fecha .toString()', ahora.toString());
+console.log('fecha .toUTCString()', ahora.toUTCString());
+console.log('fecha .toLocaleDateString()', ahora.toLocaleDateString());
+console.log('fecha .toLocaleTimeString()', ahora.toLocaleTimeString());
+console.log('fecha .toISOString()', ahora.toISOString());
+console.log('fecha .toLocaleString()', ahora.toLocaleString());
+console.log('fecha .toTimeString()', ahora.toTimeString());
+console.log('fecha .toLocaleTimeString()', ahora.toLocaleTimeString());
+```
+
+Ninguno de los métodos anteriores es ideal cuando deseamos formatear fechas y horas para mostrarlas al usuario final. Lo cual es mejor hecho con `internacionalización`.
+
+Finalmente, existe el método `Date.parse()` que toma un string como argumento e intenta representar ese string como fecha y hora, retorna un timestamp que representa una fecha. `Date.parse()` es capaz de representar fechas cuyos strings tambien puedan ser representados por el constructor `Date()`.
+
+## Clases Error
+
+Las sentencias `throw` y `catch` pueden lanzar y atrapar cualquier valor de JavaScript, incluidos valores primitivos. No hay algun tipo exception que pueda ser usado como señal de errores. JavaScript define una clase `Error`, y es tradicional usar instancias de `Error` o sunclases cuando señalamos un erorr. Una razon por la cual usar un objeto Error, es que este captura el estado de la pila de llamadas en JavaScript.
+
+Notar que la pila de llamadas muestra donde el objeto Error fue creado, no donde la sentencia `throw` lo lanzó. Si siempre creamos el objeto justo antes de lanzarlo con `throw new Error()` esto no causara ninguna confusión.
+
+Los Objetos de Error tienen dos propiedades: `message` y `name`, y un método `toString()`. El valor de la propiedad `message` es el valor que se pasa al constructor `Error()`, conviertiendolo a string si es necesario. Para objetos creados con `Error()`, el valor de la propiedad `name` simepre es `Error`.
+
+Aunque no es parte del estándar ECMAScript, Node y todos los navegadores modernos definen una propiedad `stack` en los objetos `Error`. El valor de esta propiedad es un string multilinea que contiene una `stack trace` de la pila de llamados de JavaScript al momento que el objeto Error fue creado.
+
+Ademas de la clase `Error`, JavaScript deine un número de subclases, estas subclases son `EvalError`, `RangeError`, `ReferenceError`, `SyntaxError`, `TypeError`, y `URIError`.
+
+También es posible definir clases de error propias. Si creamos una subclase, podemos deinir nuevas propiedades y detalles del error. Por ejemplo:
+
+```js
+class HTTPError extends Error {
+    constructor(status, statusText, url) {
+        super(`${status} ${statusText}: ${url}`);
+        this.status = status;
+        this.statusText = statusTextM
+        this.url = url;
+    }
+
+    get name() { return "HTTPError"; }
+}
+
+let error = new HTTPError(404, "Not found", "http://example.com/");
+
+// => 404
+error.status;
+
+// => "404 Not found: http://example.com/"
+error.message;
+
+// => "HTTPError"
+error.name;
+```
