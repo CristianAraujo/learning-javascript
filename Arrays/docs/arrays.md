@@ -1013,7 +1013,7 @@ Array.isArray({})
 
 Los objetos `array-like` no son en realidad arrays, pero en la practica, aunque no se puedan invocar directamente métodos de arrays en ellos, es posible iterar sobre sus valores con el mismo código que se haria para un verdadero array. Esto es espcialmente verdadero cuando los algoritmos tratan a los arrays como solo lectura o si ellos al menos dejan la propiedad `length` sin cambios.
 
-El siguiente código toma un objeto reglar, añade propiedades para convertirlo en un `array-like` y luego iterar a través de sus elementos.
+El siguiente código toma un objeto regular, añade propiedades para convertirlo en un `array-like` y luego iterar a través de sus elementos.
 
 ```js
 let a = {}

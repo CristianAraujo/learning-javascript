@@ -201,3 +201,43 @@
 9. ¿En que consiste el método `include()`? Explicar
 10. ¿Que hace especial a la comparación de igualdad del método `include()`? Expliar.
 11. Dar ejemplos de uso del método `include()`
+12. ¿En qué consiste el método `sort()`? Explicar
+13. ¿Qué argumentos recibe el método `sort()`?
+14. ¿Cómo se comporta el método `sort()` cuando es llamado sin argumentos? Dar ejemplos.
+15. ¿Cómo se ordenan los elementos `undefined`?
+16. Explicar la función de comparación que recibe el método `sort()`.
+17. Dar ejemplos de uso del método `sort()` para arrays con elementos numéricos y no numéricos.
+18. ¿En qué consiste el método reverse? Explicar
+19. Dar ejemplos de uso del método reverse
+
+### Conversiones de Arrays a string
+
+1. ¿Cuandos métodos se definen en la clase Array para convertir arrays a strings?
+2. ¿Qué se recominda si pensamos convertir un array a string pero volver a utilizarlo después?
+3. ¿En que consiste el método `join()`? Explicar
+4. ¿Qué argumentos recibe el método `join()`?
+5. ¿Cómo trabaja el método `join()` sino recibe argumentos?
+6. Dar ejemplos de uso del métod `join()`
+7. Expliar el método `toString()`. Dar ejemplo de uso
+8. Expliar el método `toLocaleString()`. Dar ejemplo de uso
+
+### Funciones estáticas de arrays
+
+1. ¿Cuáles son las funciones estáticas que define la clase Array? Nombrarlas y dar ejemplos de uso
+2. ¿Cómo comprobar si un valor es un array?
+
+## Objetos Array-like
+
+1. ¿Qué es un objeto `array-like`?
+2. ¿Es posible aplicar métodos de arrays sobre objetos `array-like`?
+3. ¿Cuando los objetos `array-like` se comportan mejor como arrays y por qué?
+4. Dar ejemplos de objetos `array-like`.
+5. ¿Cómo se pueden invocar métodos de la clase Array sobre ojetos `array-like`? Dar ejemplos
+6. Crear objetos `array-like` e iterar sobre ellos.
+
+## String como arrays
+
+1. Explicar porque los strings se comportan como arrys.
+2. ¿Cómo podemos acceder a los elementos de un string?
+3. ¿Qué métodos de arrays es posible aplicar sobre strings? Dar ejemplos.
+4. ¿Qué métodos de arrays no se pueden aplicar sobre strings? Explicar
