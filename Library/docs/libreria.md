@@ -789,3 +789,31 @@ let palabras = ["luz", "llama", "como", "chico"];
 palabras.sort(modernSpanish);
 palabras.sort(traditionalSpanish);
 ```
+
+## La API Console
+
+La API de consola define un número de funciones útiles. Esta API no es parte de ningún ECMAScript estandar, pero es soportada por navegadores y por Node.
+
+La API console define las siguentes funciones:
+
+- `console.log()`: Convierte sus argumentos a strings y los muestra en consola. Incluye espacios entre argumentos y comienza una nueva línea después de imprimir todos los argumentos.
+  
+- `console.debug()`, `console.info()`, `console.warn()`, `console.error()`: Funciona casi identicamente a `console.log()`. En Node, se envía el `stderr` stream en lugar de `stdout`. El resto de las funciones son alias de `console.log()`. En navegadores, podría haber algún ícono como prefijo.
+
+- `console.assert()`: Si su primer arugmento es verdadero, entonces esta función no hace nada, pero si es falso o algun `falsy` value entonces los argumentos restanes serán imprimidos como si ellos hubieran sido pasados a `console.error()` con `Assertion falied` como prefijo. No se lanza una excepción.
+
+- `console.clear()`: Limpia la consola cuando eso es posible.
+
+- `console.table()`: Intenta mostrar sus argumentos de forma tabular.
+
+### Salida formateada de consola
+
+Si el primer argumento es un string y ese string incluye `%s`, `%i`, `%d`, `%f`, `%o`, `%O` o `%c`, entonces este primer argumento es tratado como un `format string` y los valores de los argumentos subsecuentes serán sustituidos en el string en el lugar de las secuencias anteriores.
+
+- `%s`: Argumento convertido a string.
+- `%i` y `%d`: Argumentos convertidos a números y truncados como enteros.
+- `%f`: El argumento es convertido a número
+- `%o` y `%O`: El argumento es tratado como un objeto y los nombres de las propiedades y valores son mostradas. La variante en mayúsculas se muestra dependiendo de la implementación.
+- `%c`: En navegadores este argumento es interpreatado como un string de CSS y es usado para dar estilo al texto que sigue (hasta la siguiente `%c` o hasta el final del string). En Node, es ignorado.
+
+Notar que no es a menudo necesario usar `format string` con funciones de consola, es usualmente fácil obtener salidas claras simplemente pasado uno o más valores a la función.
