@@ -598,3 +598,194 @@ console.log(jsonString);
 >En este ejemplo, hemos usado una función "replacer" que aumenta en 10 el valor del elemento con clave "age". Como resultado, el valor del elemento "age" en la cadena de texto resultante es 40 en lugar de 30.
 
 En general si se define un método `toJSON()` para un tipo, o si se usa una función de reemplazo que reemplace valores no-serialiazbles por valores serializables, entonces se tipicamente se necesitará usar una función de restauración con `JSON.parse()` para obtener la estructura de datos original de vuelta. Si se hace esto, se debe entender que se está definiendo una estructura de datos personalizada y sacrificando la portabilidad y compatibilidad.
+
+## La API de internacionalización
+
+Consiste en tres clases `Intl.NumberFormat`, `Intl.DateTimeFormat` y `Intl.Collator` que permiten formatear numeros, incluyendo modenas y porcentajes, fechas y horas en versiones locales, ademas comprar strings en formatos locales apropiados.
+
+Una de las partes más importantes de la internacionalización es mostrar texto que ha sido traducido al idioma del usuario.
+
+### Formateo de números
+
+Los usuarios alrededor del mundo esperan los números formateados en diferentes maneras. Puntos decimales o comas, separadores de mil pueden ser puntos o comas, etc.
+
+**Clase Intl.NumberFormat**  
+La clase `Intl.NumberFormat` define el método `format()` que tiene en cuenta todos estos formatos posibles. El constructor toma dos argumentos. El primero especifica la zona para la cual el número deberia ser formateado, el segundo argumento es un objeto que especifica mas detalles sobre como el número debe ser formateado.
+
+Si el primer argumento es omitido o `undefined` entonces se considerará la configuración local del sistema del usuario. Si el primer argumento es un string, este especificará la zona deseada como "en-US", "es-CL", "zh-Has-CN". El primer argumento también puede ser un array de strings, en este caso se seleccionará el más especifico y bien soportado.
+
+El segundo argumento de `Intl.NumberFormat()`, si es especificado deberá ser un objeto que define una o más de las siguientes propiedades:
+
+- `style`. Tipo de formato para número decimal. Por defecto es "decimal". Especificar "percent" para porcentajes o "currency" para monedas.
+- `currencyDispaly`. Especifica como una moneda es mostrada. El valor por defecto es "symbol" que el símbolo de la moneda si esta tiene uno. El valor code, usa tres letras ISO y name muestra el nombre de la moneda en manera larga.
+- `currency`. Si el style es currency, entonces está propiedad requiere especificar el código de tres letras ISO (como USD o GNP) .
+- `useGrouping`. Configurar esta propiedad a false si deseamos que los números no tengan separadores de mil.
+- `minnimumIntegerDigitis`. Si se tienen menos números que esta cantidad, serán gregados a la izquieda con ceros. Por defecto es 0.
+- `minimumFractionDigits`, `maximumFractionDigits`. Controlan el formato de la parte fraccional de un número. Si el número tiene menos digitos fracionales que el mínimo, estos serán agregados como 0 en la derecha, si tiene más que el máximo, el número será redondeado.
+- `minimumSignificantDigits`, `maximumSignificantDigits`. Controlan el número de digitos significativos usados.
+
+Una vez creado un objeto `Intl.NumberFormant`, con las opciones locales deseadas, es posible pasarle un número a su método `format()` el cual retorna un string con el formato apropiado.
+
+Por ejemplo:
+
+```js
+let euros = Intl.NumberFormat("es", {style: "currency", currency: "EUR"});
+euros.format(10);
+```
+
+El siguiente ejemplo, es ejemplo personal, para pesos chilenos:
+
+```js
+let pesos = Intl.NumberFormat("es-CL", {
+    style: "currency", 
+    currency: "CLP",
+    currencyDisplay: "symbol",
+    maximumFractionDigits: 0
+});
+
+let amount = pesos.format(1000);
+console.log(amount);
+```
+
+El método `format()` pertenece al objeto, por lo que es posible asignar el método a una variable y usarlo como si este fuera una función aislada, por ejemplo:
+
+```js
+let data = [0.05, .75, 1];
+let formatData = Intl.NumberFormat(undefined, {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigitis: 1
+}).format;
+
+data.map(formatData);
+```
+
+### Formateando Fechas y Horas
+
+`Intl.DateTimeFormat()` toma dos argumentos: una localización o array de localizaciones y un objeto de opciones de formato. Y la manera que se usa una instancia de `Intl.DateTimeFormat()` es llamando su método `format()` para convertir el objeti `Date` a un string. La idea es que se pueda usar el objeto de opciones que especifique que campos de fecha y hora quisieramos presentar al usuario y como estos deben estar formateados.
+
+Las opciones disponibles son las siguientes:
+
+- `year`. numeric para año completo de cuatro digitos, 2-digit para una abreviación.
+- `month`:
+  - numeric: para la posibilidad de un número corto como 1
+  - 2-digit: para una representación que tiene dos digitos
+  - long: para un nombre completo como "January"
+  - short: para una abrevición como "Jan"
+  - narrow: para una abrbeviación como "J"
+
+- `day`:
+  - numeric: para una representación de uno o dos digitos
+  - 2-digit: para una representación de dos digitos para día del mes
+  
+- `weekday`:
+  - long: para un nombre completo como "Monday"
+  - short: para una abreviación como "Mon"
+  - narrow: para una abreviación como "M"
+
+- `era`: Especifica donde una fecha debe ser formateado con una era como CE o BCE (Antes o después de Cristo). Los valores permitodos son "long", "short" y "narrow".
+
+- `hour`, `minute`, `second`:
+  - numeric: para una representación de uno o dos dígitos
+  - 2-digit: para forzar una representación de 2 dígitos.
+
+- `timeZone`: Esta propiedad especifica la zona para la cual la fecha debería ser formateada. Si se omite será usada la zona local. Se reconoce "UTC" y los nombres IANA como: "America/Los_Angeles"
+
+- `timeZoneName`: Especifica como la zona horaria debería mostrarse.
+  - long: para un nombre completo
+  - shot: para una abreviación
+
+- `hour12`: Es una propiedada boleana que especifica onde usar hora en formato 12-horas. El valor por defecto es dependiente de la localización.
+
+- `hourCycle`: Esta propiedad permite especificar ya sea que la media noche sea escrita como 0 horas, 12 horas o 24 horas. hour12 tiene precedencia sobre esta propiedad.
+  - h11: media noche es 0 y la hora anterior es 11pm
+  - h12: media noche es 12
+  - h23: media noche es 0 y la hora anterior es 23
+  - h24: media noche es 24
+
+Algunos ejemplos:
+
+```js
+let d = new Date("2020-01-02T13:14:15Z");
+
+// Sin opciones, se optiene el formato generico
+// => "1/2/2020"
+Intl.DateTimeFormat("en-US").format(d)
+
+// => "02/01/2020"
+Intl.DateTimeFormat("fr-FR").format(d)
+
+let opts = { weekday: "long", month: "long", year: "numeric", day: "numeric" };
+
+// => "Thursday, January 2, 2020"
+int.DateTimeFormat("en-US", opts).format(d);
+```
+
+También es posible especificar el calendario añadiendo `-u-ca-` al argumento de la localización seguido del nombre del calendario. Por ejemplo:
+
+```js
+let opts = { year: "numeric", era: "short" };
+Intl.DateTimeFormat("en", opts).format(d);
+Intl.DateTimeFormat("en-u-ca-iso8601", opts).format(d);
+```
+
+### Comparando Strings
+
+El problema con los strings en orden alfabético, es que algunos idiomas tienen diferentes alfabetos, por lo que ordenar alfabeticamente puede se más complejo de lo que a simple vista parece.
+
+Si se desea mostrar strings al usuario en un orden que ellos persivan como natural, no es suficiente usar `sort()` en un array de strings. En estos casos es conveniente crear un objeto `Intl.Collator`, el cual podremos pasar al método `compare()` que como el método `sort()` realiza un orden de los strings con una aproximación localizada.
+
+`Intl.Collator()` toma dos argumentos, el primero especifica la localización, el segundo es un objeto cuyas propiedades especifican exactamente que tipo de comparación será hecha.
+
+- `usage`: Especifica como el objeto `collator` será usado.
+  - sort: Valor por defecto.
+  - seach
+
+- `sensitivity`: Especifica si el `collator`es sensible a mayúsculas y acentos cuando hace la comparación. Cuando la propiedad usage es sort, el valor por defecto es variant.
+  - base: Ignora mayúsculas y acentos, considera solo letra base
+  - accent: Considera los acentos en la comparación, pero ignora mayúsculas
+  - case: Considera mayúsculas, pero ignora acentos.
+  - variant: Considera acentos y mayúsculas. Comparación estricta.
+
+- `ignorePuntuation`: Configurar esta propiedad hace que se ignore la puntuación cuando se comparan strings. Con esta propiedad como true los strings "any one" y "anyone" son considerados igual.
+
+- `numeric`:
+  - true: Si los strings a comparar son enteros o contienen enteros y se desea ordenarlos en un orden numerico en lugar de alfabético. Por ejemplo "Version 9" deba ir antes que "Version 10".
+
+- `caseFirst`: Especifica que tipo de letra debe ir primero. El valor por defecto depende del lugar.
+  - upper: Las mayúsculas deben ordenarse primero
+  - lower: las minúsculas deben ordenarse primero
+
+Una vez creado el objeto `Intl.Collator` y las opciones deseadas, se usa el método `compare()` para comparar dos strings. Este método retorna un número. Si el valor retornado es menor a cero, el primer string va primero, si el valor retornado es mayor a cero, el primer string va después del segundo. Si `compare()` retorna cero, entonces los dos strings son iguales en lo que concierne al objeto `Collator`.
+
+`Int.Collator` atomaticamente une el método `compare()` a su instancia, de modo que es posible pasarlo directamente a `sort()` sin tener que escribir una función contenedora e invocarlo a través del objeto `Collator`.
+
+Aquí unos ejemplos:
+
+```js
+const collator = new Intl.Collator().compare;
+["a", "z", "A", "Z"].sort(collator);
+
+const filenameOrder = new Intl.Collator(undefined, {numeric: true }).compare;
+["page10", "page9"].sort(filenameOrderr);
+
+const fuzzyMatcher = new Intl.Collator(undefined, {
+  sensitivity: "base",
+  ignorePunctuation: true,
+}).compare;
+let strings = ["food", "fool", "Føø Bar"];
+
+// => 2
+strings.findIndex(s => fuzzyMatcher(s, "footbar") === 0)
+```
+
+Algunos lugares tienen más de un posible orden, por ejemplo, en España antes de 1994 "ch" y "ll" eran tratadas como letras individudales. Ese tipo de variantes no puede ser seleccionadas a traves de `Intl.Collator`, pero pueden ser añadidas pasado `-u-co-` a string de localización y añadiendo el nombre de la variante deseadaa. Por ejemplo:
+
+```js
+// Antes de 1994 CH y LL era tratadas como letras separadas en España
+const modernSpain = Int.Collator("es-ES").compare;
+const traditionalSpanish = Intl.Collator("es-ES-u-co-trad").compare;
+let palabras = ["luz", "llama", "como", "chico"];
+palabras.sort(modernSpanish);
+palabras.sort(traditionalSpanish);
+```
