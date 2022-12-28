@@ -470,3 +470,131 @@ error.message;
 // => "HTTPError"
 error.name;
 ```
+
+## Serialización y Parsing JSON
+
+El proceso de convertir estructuras de datos a streams de bytes o caracteres es conocido como serialización (o marshaling o pickling).
+
+La manera mas fácil de serializar informaicón en JavaScript es usando el formato `JSON`. JSON soporta valores primitivos de números, strings, y también `true`, `false` y `null` como también `arrays` y objetos creados a partir de estos valores primitivos.
+
+JavaScript soporta la serialización y deserialización JSON con dos funciones `JSON.stringify()` y `JSON.parse()`. Es posible serializar un objeto pasandolo como argumento a la funció´n `JSON.stringify`, la cual retornará un string, dado este string, es posible pasarlo como argumento a la función `JSON.parse()` y recrear la estructura de datos originall.
+
+```js
+// Se crea un objeto
+let o = {s: "", n: 0, a: [true, false,  null]};
+
+// Se pasa el oobjeto o a la función JSON.stringify 
+// s == '{"s":"","n":0,"a":[true,false,null]}'
+let s = JSON.stringify(o);
+
+// Se pasa el objeto s a la función JSON.parse que devuelve
+// la estructrua de datos a su forma original
+// copy == {s: "", n: 0, a: [true, false, null]}
+let copy = JSON.parse(s);
+```
+
+Tanto `JSON.stringify()` como `JSON.parse()` aceptan un segundo argumento que nos permite extender el formato JSON. `JSON.stringify()` también toma un tercer argumento opcional, este tercer agumento le dice a `JSON.stringify()` que debería formatear la información en múltiples lineas indentadas. Si el tercer argumento es un número, este será la cantidad de espacios usados para la indentación de cada nivel. Si el tercer argumento es un string de espacios en blanco, como `\t`, se usará este string como indentación de cada nivel.
+
+```js
+let o = {s: "test", n: 0};
+
+// => '{\n "s": "test", \n  "n": 0\n}'
+JSON.stringify(o, null, 2);
+```
+
+`JSON.parse()` ignora los espacios en blanco, por lo que pasar un tercer argumento a `JSON.stringify()` no tiene impacto en convertir de vuelta la estructura de datos.
+
+### Configuraciones JSON
+
+Si se solicita serializar un valor con `JSON.stringify()` que no es nativamente soportado por el formato JSON, este método busca si el valor tiene un método `toJSON()`, y si es así, entonces lo llama y serializa el valor en el lugar del valor original. Cuando se deserializa la estructura, es posible que no sea exactmante igual que la del comienzo.
+
+Si se necesita re-crear objetos serializados, es posible pasar una `reviver function` como segundo argumento de `JSON.parse()`. Esta función es invocada una vez por cada valor primitivo (pero no para objetos o arrays que contengan esos valores primitivos) parseando el string de entrada. La función es invocada con dos argumentos, el primero, el nombre de la propiedad, el segundo argumento es el valor primitivo de ese objeto o elemento de array. Además, la función es invocada como un método del objeto que contiene el valor primitivo, por lo que podemos referirnos al objeto contenedor con `this`.
+
+>La reviver function es una función que se llama para cada clave-valor en el objeto resultante, y permite modificar el valor devuelto por JSON.parse. La reviver function se llama con dos argumentos: el clave y el valor del objeto. Si se devuelve el mismo valor que se proporciona como argumento, se mantiene el valor original. Si se devuelve un valor diferente, se reemplaza el valor original con el nuevo valor. Por ejemplo, supongamos que tenemos la siguiente cadena de texto en formato JSON:
+
+```js
+const jsonString = '{"name":"John", "age":30, "city":"New York"}';
+
+// Podemos parsear esta cadena con JSON.parse de la siguiente manera:
+const obj = JSON.parse(json);
+
+// imprime {name: "John", age: 30}
+console.log(obj); 
+
+// Podemos usar JSON.parse() junto con una función "reviver"
+// para convertir esta cadena en un objeto de JavaScript y 
+// modificar el valor de algunos de sus elementos de la 
+// siguiente manera:
+const obj = JSON.parse(jsonString, (key, value) => {
+  if (key === 'age') {
+    return value + 10;
+  }
+  return value;
+});
+
+console.log(obj.name); // imprime 'John'
+console.log(obj.age); // imprime 40
+console.log(obj.city); // imprime 'New York'
+```
+
+El valor retornado por la `reviver functions` o `funciones de restauración` se convierte en el nuevo valor de la propiedad nombrada. Si esta función retorna `undefined`, entonces la propiedad será removida del objeto antes de que `JSON.parse()` retorne al usuario. Si la función retorna el mismo valor recibido como argumento, entonces la propiedad permanece sin cambios.
+
+Un ejemlo quqe usas una función de restauración para filtrar algunas propiedades y re-crear objetos tipo `Date`.
+
+```js
+let data = JSON.parse(text, function(key, value) {
+    if (key[0] === "_") return undefined;
+    if( typeof value === "string" &&
+        /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ$/.test(value)) {
+        return new Date(value);    
+    }
+
+    return value;
+});
+```
+
+**Personalización de JSON.stringify()**  
+`JSON.stringify` permite personalizar la salida mediante un segundo argumento opcional, que recibe un array o una función.
+
+Si el segundo argumento es un array de strings (o números que son convertidos a strings) estos son usados como nombres de las propiedades de objeto, cualquier propiedad cuyo nombre no este en el objeto será omitida para la serialización. Además, el string retornado incluirá las propiedades en el mismo orden que aparecen en el array.
+
+Si el segundo argumento es una función, esta función es conocida como una `replacer function`. Es invocada por cada valor a ser serializado. El primer argumento de la `replacer function` es el nombre de la propiedad del objeto o el indice del array del valor en ese objeto, y el segundo argumento es el valor en si mismo. Esta función es invocada como un método del objeto o array que contiene el valor que será serializado.
+
+El valor retornado por la `replacer function` es la serialización del valor original en su lugar. Si se retorna `undefined` o nada en lo absoluto, entonces el valor es omitodo de la serialización.
+
+```js
+// Se especifican que campos serán serializados y que orden.
+let text = JSON.stringify(address, ["city", "state", "country"]);
+
+// Se expecifica una replacer function que omite los valores de
+// RegExp
+let json = JSON.stringify(o, (k,v) => v instanceof RegExp ? undefined : v);
+```
+
+>En JavaScript, la función JSON.stringify() se utiliza para convertir un objeto o un valor primitivo en una cadena de texto en formato JSON (JavaScript Object Notation). Esta función acepta un segundo argumento opcional llamado "replacer", que es una función o un array de cadenas que se llama para cada uno de los elementos del objeto o del array que se está convirtiendo.  La función "replacer" se llama con dos argumentos: el clave del elemento y el valor del elemento. Si la función "replacer" devuelve el valor del elemento sin modificaciones, se usará ese valor para el elemento correspondiente en la cadena de texto en formato JSON resultante. Si la función "replacer" devuelve undefined, el elemento no se incluirá en la cadena de texto resultante. Si la función "replacer" devuelve un valor distinto, se usará ese valor en lugar del valor original. Por ejemplo, supongamos que tenemos el siguiente objeto:
+
+```js
+const obj = {
+  name: 'John',
+  age: 30,
+  city: 'New York'
+};
+```
+
+>Podemos usar JSON.stringify() junto con una función "replacer" para convertir este objeto en una cadena de texto en formato JSON y modificar el valor de algunos de sus elementos de la siguiente manera:
+
+```js
+const jsonString = JSON.stringify(obj, (key, value) => {
+  if (key === 'age') {
+    return value + 10;
+  }
+  return value;
+});
+
+// imprime '{"name":"John","age":40,"city":"New York"}'
+console.log(jsonString);
+```
+
+>En este ejemplo, hemos usado una función "replacer" que aumenta en 10 el valor del elemento con clave "age". Como resultado, el valor del elemento "age" en la cadena de texto resultante es 40 en lugar de 30.
+
+En general si se define un método `toJSON()` para un tipo, o si se usa una función de reemplazo que reemplace valores no-serialiazbles por valores serializables, entonces se tipicamente se necesitará usar una función de restauración con `JSON.parse()` para obtener la estructura de datos original de vuelta. Si se hace esto, se debe entender que se está definiendo una estructura de datos personalizada y sacrificando la portabilidad y compatibilidad.
