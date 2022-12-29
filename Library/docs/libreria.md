@@ -1004,3 +1004,37 @@ Cuando `escape()` y `unescape()` fueron deprecadas, ECMAScript introdujo dos par
 - `encodeURIComponent()` y `decodeURIComponent()`: Funcionan como `encondeURI()` y `decodeURI()` excepto que ellos estan destinados a escapar componentes individuales de una `URI`, así estos tambíen escapan caracteres como `/`, `?`, `#` que son usados para separar esos componentes.
 
 El problema fundamentar con estas funciones que ellas buscan aplicar un solo patrón de codificación para todas las partes de una `URL` cuando de hecho para diferentes partes de una `URL` se usan distintas codificaciones. Es recomendado formatear y codificar URLs usando la clase `URL`.
+
+## Timers
+
+`setTimeout()` y `setInterval()` permiten al programa invocar una función despues de un determinado periodo de tiempo o repetidamente en un intervalo especificado.
+
+**setTimeout()**  
+El primer argumento de `setTimeout()` es una función, y el segundo argumento es un número el cual especifica cuantos milisegundos deben pasar antes de que la función se invoque. Luego de ese periodo de tiempo la función será invocada sin argumentos, o después de ese tiempo si el sistema está ocupado. Por ejemplo:
+
+```js
+setTimeout(() => { console.log("Ready..."); }, 1000);
+setTimeout(() => { console.log("Ready..."); }, 2000);
+setTimeout(() => { console.log("Ready..."); }, 3000);
+```
+
+Si se omite el segundo argumento, su valor por defecto será 0, que no significa que la función será invocada inmediatamente, sino que la función es registrada para ser invocada tan pronto como sea posible.
+
+**setInterval()**  
+`setInterval()` toma los mismos argumentos que `setTimeout()` pero invoca la función repetidamente cada cantidad de milisegundos especificados en el segundo parámetro (aproximadamenete).
+
+```js
+setInterval(() => "hola como estas?", 2000);
+```
+
+Ambas funciones retoran un valor, si se guarda este valor retornado en una varibale, es posible usarlo para cancelar la ejecución de la función pasandolo como argumento a `clearTimeout()` o `clearInterval()`. El valor retornado es tipicamente un número en los navegadores y un objeto en Node. El tipo en realidad no importa y debería tratarse como un valor opaco. Por ejemplo:
+
+```js
+let clock = setInterval(() => {
+  console.clear();
+  console.log(new Date().toLocaleTimeString());
+}, 1000);
+
+// Pasados 10 segundos se para la repetición
+setTimeout(() => { clearInterval(clock); }, 10000);
+```
