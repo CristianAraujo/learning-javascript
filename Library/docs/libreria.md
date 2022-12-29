@@ -261,10 +261,342 @@ m.forEach((value, key) => {
 
 Puede parecer extraño que el primer parámetro sea `value` y el segundo sea `key`. En el método `forEach()` de la clase Array, se pasa como primer argumento el elemento del array y como segundo elemento el índice; por lo que, por analogía, el método `forEach()` de la clase `Map` pasa primero el valor y luego la clave.
 
-## WeakMap y WeakSet
+### WeakMap y WeakSet
 
 **WeakMaps**  
 Los `WeakMaps` son una clase que es una variante, pero no una subclase de `Map`.
+
+## Typed Arrays y Binary Data
+
+---
+`Typed arrays` no son técnicamente arrays (Array.isArray() retorna false para ellos), aunque ellos implementan todos los métodos de los arrays además de los propios.
+
+Los `Typed arrays` son diferentes de los arrays en algunos aspectos importantes como:
+
+- Los elementos de un typed array son todos números, además es posible especificar el tipo y tamaño de los números almacenados en el array.
+- Se debe especificar la longitud del array cuando se crea y esta nunca puede cambiar.
+- Los elementos de un typed array siempre son inicializados a 0 cuando el array es creado.
+
+### Tipos en Typed Arrays
+
+JavaScript no define una clase TypedArray, en su lugar hay 11 tipos de typed arrays, cada uno con diferente tipo de constructor.
+
+- `Int8Array()`. bytes con signo
+- `Uint8Array()`. bytes sin signo
+- `Uint8ClampedArray()`. bytes sin signo sin rollover
+- `Int16Array()`. bytes sin signo sin rollover
+
+Los tipos cuyos nombres comienzan con `Int` manejan enteros con signo de 1, 2 o 4 bytes (8, 16 o 32 bits). Los tipos cuyos nombres comienzan con `Uint` manejan enteros sin signo de la misma longitud. `BigInt` y `BigUint` manejan enteros de 64-bit.
+
+Los tipos de comiezan con `Float` manejan números de punto floante. `Float64Array` son el mismo tipo que los números regulares de JavaScript. `Float32Array` tinen menos precisión y un rango más pequeño, pero solo requieren la mitad de memoria (Este es el tipo llamado `Float` en C y Java).
+
+`Uint8ClampedArray` es una variante de `Uint8Array`, ambos representan números entre 0 y 255, pero con `Uint8ClampedArray` si se almacena un valor mayor a 255 o menor a 0, este se "sujeta" a 255 o 0.
+
+Cada constructor tiene una propiedad `BYTES_PER_ELEMENT` con el valor 1, 2, 4 o 8 dependiendo del tipo.
+
+### Creando Tped Arrays
+
+**Mediante su constructor**  
+La forma más simple es usandod el apropiado constructor con un valor numérico que especifica el número de elementos que se desea en el array.
+
+```js
+let bytes = new Uint8Array(1024); // 1024 bytes
+let matrix = new Float64Array(9); // A 3x3 matrix
+let point = new Int16Array(3); // A point in 3D space
+let rgba = new Uint8ClampedArray(4); // A 4-byte RGBA pixel value
+let sudoku = new Int8Array(81); // A 9x9 sudoku board
+```
+
+**Mediante of() y from()**  
+Si se conocen los valores, es posible especificarlos al crear el array. Cada typed array define métodos "fábrica" estáticos `from()`y `of()` que funcionan como `Array.from()` y `Array.of()`
+
+```js
+// Color RGBA blanco
+let white = Uint8ClampedArray.of(255, 255, 255, 0);
+```
+
+`from()` espera un iterble u objeto array-like como su argumento, pero los elementos de este objeto deben ser numéricos.
+
+El método `from()` también nos permite copiar un typed array existente con la posibilidad de cambiar su tipo:
+
+```js
+let white = Uint8ClampedArray.of(255, 255, 255, 0);
+let ints = Uint32Array.from(white);
+```
+
+Cuando se creaa un nuevo typed array desde un array existente, iterable u objeto array-like, los valores podrían ser truncados en orden de ajustarse a las restricciones del array.
+
+```js
+// Los numéros flotantes son truncados a enteros, y los enteros
+// mayores al rango son truncados a 8 bits
+// => [1, 2, 200]
+Uint8Array.of(1.23, 2.9, 45000)
+```
+
+**Mediante ArrayBuffer**  
+Un `ArrayBuffer` es una referencia opaca a un trozo de memoria. Es posibbe crear uno con su constructor, solo pasandole el número de bytes de memoria que desemos apartar.
+
+```js
+let buffer = new ArrayBuffer(1024*1024);
+buffer.byteLength
+```
+
+La clase `ArrayBuffer` no permite leer o escribir ningún byte de la memoria que se ha apartado. Sin embargo, es posible crear typed arrays usando el buffer de memoria.
+
+Para hacer esto, llamamos el constructor del typed array con un `ArrayBuffer` como el primer argumento, un número que especifique los bytes de desplazamiento dentro del array buffer como segundo argumento, y el tamaño del array en elementos como tercer argumento. El segundo y tercer argumento son opcionales. Si se omiten ambos, el array usara toda la memoria en el buffer; si se omite el desplazamiento, el array usará la memoria desde el comienzo del buffer.
+
+Los arrays deben ser "alineados a la memoria" del buffer, por lo que cuando se especifica un `offset` el valor debe ser un múltiplo del tipo del typed array.
+
+Podemos crear typed arrays a partir de ArrayBuffers asi:
+
+```js
+let buffer = new ArrayBuffer(1024*1024);
+let asbytes = new Uint8Array(buffer);
+let asints = new Uint32Array(buffer);
+let lastK = new Uint8Array(buffer, 1023*1024);
+
+// El desplazamiento es de 1024 bytes y el tamaño de los 
+// elementos será de 256 enteros
+let ints2 = new Uint8Array(buffer, 1023*1024);
+```
+
+Es importante comprender que todos los typed arrays tienen debajo un ArrayBuffer aunque no se especifiquen explicitamente. La propiedad `buffer` de los Typed Arrays se refiere a su respectivo objecto ArrayBuffer.
+
+La razón para trabajar directamente con objetos ArrayBuffer es que en ocasiones es posible querer tener distintas vistas de Typed Arrays sobre un único buffer.
+
+### Usando Typed Arrays
+
+Es p osible escribir y leer elementos de un Typed Array con la notación de corchetes como con cualquier otro objeto array-like. Por ejemplo:
+
+```js
+function sieve(n) {
+  let a = new Uint8Array(n + 1);
+  let max = Math.floor(Math.sqrt(n));
+  let p = 2;
+  while(p <= max) {
+    for(let i = 2*p; i <= n; i += p) { a[i] = 1; }
+    while(a[++p])
+  }
+  while(a[n]) n--;
+  return n;
+}
+```
+
+Los Typed Arrays tienen longitudes fijas, por lo que la propiedad `length` es de solo lectura. Métodos que alteren los contenidos del array sin cambiar su longitud como `sort()`, `reverse()` y `fill()` son implementados. Los métodos `map()` y `slice()` retornan nuevos typed arrays del mismo tipo sobre del array sobre el cual son invocados.
+
+### Métodos y propiedades de los Typed Arrays
+
+Además de los métodos implementados de la clase Array, se definen:
+
+`set()`, el cual configura multiples elementos de un Tped Array a la vez copiando los elementos de un array regular o typed array:
+
+```js
+let bytes = new Uint8Array(1024);
+let pattern = new Uint8Array([0, 1, 2, 3]);
+bytes.set(pattern);
+bytes.set(pattern, 4);
+bytes.set([0, 1, 2, 3], 8);
+bytes.slice(0, 12);
+```
+
+El método `set()` toma un array o type array cmo su primer agumento y un offset como segundo argumento el cual es opcional y por defecto es 0.
+
+`subarray()`. retorna una porción del array sobre el cual es llamado. Toma los mismos argumentos que `slice()` y trabaja de forma similar, pero con una importante diferencia. `slice()` retorna un typed array independiente del original, mientras `subarray()` no copia nada en memoria, solo retorna una nueva vista de los mismos valores:
+
+```js
+// Crea un array de 10 short integers
+let ints = new Int16Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+// Se ibtiene una vista de los útimos tres elementos
+let last3 = ints.subarray(ints.length-3, ints.length);
+
+// => 7: El primer elemento de los últimos 3 elementos es 7
+last3[0];
+
+// Se cambia el valor del elemento con índice 9 en array original
+ints[9] = -1
+
+// El valor también cambia en el subarray ya que es una vista
+// del array original
+// => -1
+last3[2];
+```
+
+**Propiedades relacionadas con el buffer**  
+Cada typed array tiene tres propiedades que lo relacionan con el buffer subyasente.
+
+- `buffer`. Es el ArrayBuffer del array.
+- `byteOffset`. Es la posición inicial de los datos en el buffer.
+- `byteLength`. Es el tamaño de los datos en bytes.
+
+```js
+let ints = new Int16Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+let last3 = ints.subarray(ints.length-3, ints.length);
+
+// Representa el ArrayBuffer asociado
+last3.buffer
+
+// Ambos son vistas del mismo buffer
+// => true
+last3.buffer === ints.buffer
+
+// Esta vista comienza en el byte 14 del buffer
+// => 14
+last3.byteOffset
+
+// Esta vista es de 6 bytes (3 de 16 bit) long
+// => 6
+last3.byteLength
+
+// El buffer subyasente tiene 20 bytes
+// => 20
+last3.buffer.byteLength
+```
+
+Para cualquier tipo de typed array, a, esto debe ser tiempre true:
+
+```js
+a.length * a.BYTES_PER_ELEMENT === a.byteLength
+```
+
+**ArrayBuffer como espacio opaco**  
+Los ArrayBuffer son espacios opacos de memoria, es posible acceder a estos bytes mediante typed arrays, pero un ArrayBufferr no es un Typed Array en si mismo. Es posible usar un array numérico indexado con un ArrayBuffer tanto como es posible con cualquier objeto de JavaScript. Hacer esto no nos entrega acceso a los bytes en el buffer. Por ejemplo:
+
+```js
+// Se crea un Typed Array
+let bytes = new Uint8Array(8);
+
+// Se configura el primer byte con el valor de 1
+bytes[0] = 1;
+
+// Los buffer no tienen índice 0
+// => undefined
+bytes.buffer[0]
+
+// Intento incorrecto de configurar un byte en el buffer
+bytes.buffer[1] = 255
+
+// Configuración dada por el tipo del typed array
+// => 255
+bytes.buffer[1]
+
+// No se ha dado un valor para el byte 1
+// => 0
+bytes[1]
+```
+
+**Crear vistas a partir de un Typed Array**  
+Anteriormente se creo un ArrayBuffer con el constructor ArrayBuffer() y a partir de ahí se crearon vistas. Otra aproximación es crear un typed array inicial y usar el buffer de este array para crear vistas. Por ejemplo:
+
+```js
+// Se crea un Typed Array de 1024 bytes
+let bytes = new Uint8Array(1024);
+
+// Usando el buffer de bytes, se crea un nuevo Type array
+// de 256 integer
+let ints = new Uint32Array(bytes.buffer);
+
+// Usando el buffer de bytes se crea otra vista.
+let floats = new Float64Array(bytes.buffer);
+```
+
+**Acceso al mismo buffer desde distintas vistas**  
+Si se crean distintas vistas de un Buffer, por ejemplo:
+
+```js
+let bytes = new Uint8Array(1024); // 1024 bytes
+let ints = new Uint32Array(bytes.buffer); // or 256 integers
+let floats = new Float64Array(bytes.buffer);
+```
+
+¿Qué sucede si se guardan valores en el type array floats y se accede al buffer desde ints ya que los tipos son diferentes, como se muestran los datos? Explicar.
+
+>Cuando creas distintas vistas de un mismo buffer en JavaScript, estás creando diferentes formas de ver y acceder a los datos que se almacenan en el buffer. En el ejemplo que has proporcionado, has creado tres vistas diferentes del mismo buffer: una vista de bytes (Uint8Array), una vista de enteros de 32 bits sin signo (Uint32Array) y una vista de números de punto flotante de 64 bits (Float64Array). Si modificas los datos del buffer a través de una de estas vistas y luego accedes al buffer desde otra vista, los datos que veas pueden no corresponder a lo que esperabas. Esto se debe a que las vistas utilizan diferentes tipos de datos para representar los datos del buffer y, por lo tanto, pueden mostrar los datos de manera diferente. Por ejemplo, si guardas un valor en el buffer a través de la vista de números de punto flotante (floats) y luego accedes al buffer desde la vista de enteros de 32 bits sin signo (ints), puede que no veas el valor que esperabas. Esto se debe a que el tipo de datos de la vista de enteros de 32 bits sin signo no es compatible con el tipo de datos de punto flotante y, por lo tanto, no puede representar adecuadamente el valor almacenado en el buffer. En este caso, puede que veas un valor que no tiene sentido o que es diferente al valor que esperabas. Es importante tener en cuenta que las vistas de un buffer son simples formas de acceder a los datos del buffer y que no afectan de manera permanente a los datos del buffer. Si cambias los datos del buffer a través de una vista y luego accedes al buffer desde otra vista, los datos del buffer no se modificarán de manera permanente. Sin embargo, es posible que veas resultados inesperados al acceder al buffer desde una vista que no es compatible con el tipo de datos utilizado para modificar los datos del buffer.
+
+### DataView y Endiannes
+
+Los Typed Arrays nos permiten ver la misma secuencia de bytes n trozos de distinto tamaño de 8, 16, 32 o 64 bits. Esto expone lo que es `endianness (extremidad)`: el orden en el cual los bytes son ordenados en palabras más largas. Los Type Arrays usan `endianness` nativa del hardware subyacente.
+
+En sistemas de pequeña `endiannes` (little-endian systems), loso bytes de números son orrenaros en un ArrayBuffer desde el menos significante al más significante. En plataformas de gran endianness, los bytes son ordenados desde el más significante al menos significante.
+
+Para determinar el `endiannes` de una plataforma podemos usar:
+
+```js
+// Si el entero 0x00000001 es ordenado en memoria como 01 00 00 00
+// entonces estamos en una plataforma con pequeña endianness.
+// En una plataforma de endiannes grande se debe obtener 
+// bytes 00 00 00 01.
+let littleEndian = new Int8Array(new Int32Arra(y[1]).buffer)[0] === 1;
+```
+
+**Clase DataView**  
+La mayoria de las arquitecturas de CPU actuales son little-endian. Sin embargo muchos protocolos de red y formatos de archivos requieren big-endian. Si estamos usando typed-arrays para los cuales la información viene desde la red o un archivo, no podemos asumir que la plataforma tiene la `endiannes` concidente con el orden de los bytes en la información que nos llega. En general cuando trabajamos con datos externos, podemos usar `Int8Array` y `Uint8Array` para ver la información como un array de bytes individuales.
+
+Es aquí donde se recomienda el uso de la clase `DataView` la cual define metodos para leer y escribir valores de un ArrayBuffer con un orden de bytes especificado explicitamente.
+
+DataView define 10 métodos `get` de los 10 tipos de typed array, excluyendo `Uint8ClampedArray`. El primer argumento es el byte offside dentro del ArrayBuffer, el segundo es un argumento opcional; un valor boleano. Si el segundo arguento es omitido o es `false`, big-endian ordering es usada. Si el segundo argumento es `true`, little-endian ordering es usada.
+
+Por ejemplo:
+
+```js
+// Asumimos que tenemos un typed array de bytes de información
+// binaria para procesar. Primero creamos un objetot DataView 
+// asi podemos leer y escribit flexiblemente valores desde esos
+// bytes
+let view = new DataView(
+  bytes.buffer, bytes.byteOffset, bytes.byteLength
+);
+
+// Lee el big-endian signed int desde el byte 0
+let int = view.getInt32(0);
+
+int = view.getInt32(4, false);
+int = view.getInt32(8, true);
+view.setUint32(8, int, false);
+```
+
+`DataView` también define 10 correspondientes métodos `set` que escriben valores en el subyasente ArrayBuffer. Su primer argumento es el offset en el cual los valores comiezan. El segundo argumento es el valor a escribir. cada método excepto `setUnt8()` y `setUint8()` aceptan un tercer opcional argumento. Si este tercer argumento es omitdio o es `false` el valor será escrito con `big-endian` format, con el byte más significativo a principio. Si el argumento es `true`, el valor es escrito con `little-endian` format, con el valor menos significativo al principio.
+
+Los Typed Arrays y la clase `DataView` nos entregan todas las herramientas para procesar información binaria y escribir programas que hagan cosas como descomprimir archivos ZIP o extraer metadatos desde un archivo JPEG.
+
+## Coincidencia de patrones con Expresiones Regulares
+
+Una expresión regular es un objeto que describe un patrón de texto. La clase `RegExp`} representa una expresión regular en JavaScript. Se debe aprender a como describir patrones de texto usando la gramatica de las expresiones regulares, lo cual es en escencia un mini lenguaje en si mismo.
+
+## Definiendo expresiones regulares
+
+Las expresiones regulares pueden crearse con el constructor `RegExp()` como también como expresiones regulares literales que son caracteres entre un par de slashes `/`.
+
+```js
+// Expresión regular creada con el constructor
+let patter = new RegExp("s$");
+
+// Expresión regular literal
+let pattern2 = /s$/;
+```
+
+La especifiación de patrones de las expresiones regulares consiste en una serie de carácteres, la mayoria, inclueyendo los caracteres alfanuméricos coinciden consigo mismos. Otros caracttres no coinciden literalmente, por ejemplo `$` indica el final de un string. Las expresiones regulares también tienen "banderas" que se colocan luego del segundo slash o como segundo parámetro en el constructor y sirven para alterar como estas funcionan. Por ejemplo `i` indicaría que la expresión regular sea case-insensitive.
+
+**Caracteres y metacaracteres usados en expresiones regulares**  
+_Caracteres literales_  
+Todos los caracteres alfabeticos y digitos coinciden con sigo mismos literalmente. Algunas expresiones regulares también soportan ciertos caracteres no alfabeitos a traves de secuencias de escapep que comienzan con `\`.
+
+_Caracteres de puntuación con significados especiales_  
+Completar
+
+**Caracteres de clases**  
+Los caracteres individuales pueden ser combinados en `caracteres de clase` pasadolos dentro de corchetes. Un caracter de clase coincide con cualquier caracter que este contenido en esta. Por ejemplo `/[abc]/` coincide con cualquier a,b,c.
+
+La negación de los caracteres de clase también puede ser definida, estos coincidirán con cualquier carácter menos los contenidos en los corchets. Se especifica con `^` adelante de los carácteres dentro de los corchetes. Por ejemplo `/[^abc]/`.
+
+Los caracteres de clase pueden usar un guión para indicar un rango, por ejemplo cualquier letra minúscula del alafabeto Latino sería: `/[a-z]/`. Si se desea incluir un guión como parte de de los caracteres de clase, se añade como el último carácter antes del segundo corchete.
+
+También se inluyen los carácteres especiales y las secuencias de escape. Por ejemplo `\s` coincide con el carácter de espacio, tab y cualquier otro caracter de espacio en blanco unicode; `\S` coincide con cualquier caracter que no sea un espacio en blanco unicode. Es posible además definir nuestras propieas clases de carácteres Unicode, por ejemplo: `/[\u0400-\u04FF]/`. El caracter `\b` tiene un significado especial. Cuando es usado dentro de caracteres de clase, este representa el caracter `backspace` o retorno de carro.
+
+_Caracteres de clase Unicode_  
+En ES2018, si una expresión resular usa la bandera `u`, entonces el caracter de clase \p{...} y su negación \P{...} son soportadas.
+
+El caracter de clase `\d` coincide solo con digitos ASCII. Si se desea coincidir con digitos decimales
 
 ## Fechas y horas
 
