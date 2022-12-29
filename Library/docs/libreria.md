@@ -817,3 +817,190 @@ Si el primer argumento es un string y ese string incluye `%s`, `%i`, `%d`, `%f`,
 - `%c`: En navegadores este argumento es interpreatado como un string de CSS y es usado para dar estilo al texto que sigue (hasta la siguiente `%c` o hasta el final del string). En Node, es ignorado.
 
 Notar que no es a menudo necesario usar `format string` con funciones de consola, es usualmente fácil obtener salidas claras simplemente pasado uno o más valores a la función.
+
+## API URL
+
+La clase `URL` analiza URLs y también permite la modificación de URLs existentes. También maneja apropiadamente temas complejos como escapar los variados componentes de una URL.
+
+La clase `URL` no es parte de ningún estándar ECMASCript, pero funciona en los navegadores y en Node.
+
+**Crear un objeto URL**  
+Es posible crear un objeto URL con el constructor `URL()` que recibe como primer argumento una URL absoluta que es relativa a su segundo argumento. Una vez creado el objeto, podemos consultar las diferentes partes de la URL:
+
+```js
+let URL = new URL("https://example.com:8000/path/name?q=term#fragment");
+
+url.href // => "https://example.com:8000/path/name?q=term#fragment"
+url.origin // => "https://example.com:8000"
+url.protocol // => "https:"
+url.host // => "example.com:8000"
+url.hostname // => "example.com"
+url.port // => "8000"
+url.pathname // => "/path/name"
+url.search // => "?q=term"
+url.hash // => "#fragment"
+```
+
+Las URL pueden incluir un nombre de usuario y una conrtraserña y la clase `URL` puede analiazar esos componentes:
+
+```js
+let url = new URL("ftp://admin:1337!@ftp.example.com/");
+
+url.href // => "ftp://admin:1337!@ftp.example.com/"
+url.origin // => "ftp://ftp.example.com"
+url.username // => "admin"
+url.password // => "1337!
+```
+
+Es posible configurar las propiedades de una URL mediante el objeto URL.
+
+```js
+// Se parte con un servidor
+let url = new URL("https://example.com")
+
+// Añade al path 
+url.pathname = "api/seach";
+
+// Añade un parámetro de consulta
+url.search = "q=test";
+
+// "https://example.com/api/seach?q=test"
+url.toString()
+```
+
+La clase `URL` añaae correctamente puntuación y caracteres especiales de escape en URLs cuando es necesario:
+
+```js
+let url = new URL("http://example.com");
+url.pathname = "path with spaces";
+url.seach = "q=foo#bar";
+
+// => "/path%20with%20spaces"
+url.pathname
+
+// => "?q=foo%23bar"
+url.seach
+
+/// => "https://example.com/path%20with%20spaces?q=foo%23bar"
+url.href
+```
+
+La propiedad `href` en estos ejemplos es especial: leer `href` es equivalente a llamar a `toString()`: reemsambla todas las partes de la URL en un string que reprenta la forma canonica de la URL.
+
+**urlencoded format**
+A menudo, las peticiones HTTP codifican los valores de múltiples campos de formulario o múltiples parámetros de API en una porcón de una consulta en la URL usando `application/x-www-form-urlencoded`. En este formato, la posición de la consulta en la URL es un signo de interrogación seguido por uno o más pares nombre/valor, loa cuales están separados por ampersands (&). El mismo nombre puede aparecer más de una vez.
+
+Si se desea codificar ese tipo de pares nombre/valor en una porción de una consulta en la URL, entoncesla propiedad `searchParams` será más útil que la propiedad `seach`. `seachPrarams` es una propiedad de solo lectura que referencia al objeto `URLSearchParams`.
+
+**URLSearchParams**  
+Es una interfaz que define métodos para configurar, añadir, borrar y ordenar los parametros codificados en una porción de consulta de la URL.
+
+```js
+let url = new URL("http://example.com/search");
+
+// => "": No hay una consulta
+url.search
+
+// Añade un parámetro de búsqueda
+url.searchParams.append("q", "term");
+
+// => "?q=term"
+url.search
+
+// Se cambia el valor de q
+url.searchParams.append("q", "x");
+
+// => "?q=x"
+url.search
+
+// "x" : Se consulta el valor del parámetro
+url.searchParams.get("q")
+
+// true: El parámetro existe
+url.searchParams.has("q")
+
+// false: El parametro p no existe
+url.searchParams.get("p")
+
+// Se añade otro parámetro
+url.searchParams.append("opts", "1");
+
+// => "?q=x&opts=1"
+url.searchParams()
+
+// Se añade otro valor con el mismo nombre
+url.searParams.append("opts", "&");
+
+// => "?q=x&opts=1&opts=%26"
+url.searchParams()
+
+//=> "1" : El primer valor
+url.searchParams.get("opts")
+
+// => ["1", "&"] : Todos los valores
+url.searchParams.getAll("opts");
+
+// Pone los parámetros en orden alfabetico
+ulr.searchParams.sort()
+
+// => "?opts=1&opts=%26&q=x"
+url.search
+
+// Cambia los parámetros opts
+url.searchParams.set("opts", "y");
+
+// => "?opts=y&q=x"
+url.search
+
+// SearchParams is iterable
+// => [["opts", "y"], ["q", "x"]]
+[...url.searchParams]
+
+// Borrar el parametro opts
+url.searchParams.delete("opts");
+
+// => "?q=x"
+url.seach
+
+// => "https://example.com/seach?q=x"
+url.href
+```
+
+El valor de la propiedad `searchParams` es un objeto `URLSearchParams`. Si se desea codificar parámetros en una URL en un string de consulta, es posible crea un objeto `URLSearchParams` y añadir los parametros, luego convertirlo en un string y configurar la propiedad `search` de la URL.
+
+```js
+// Se crea un nuevo objeto URL
+let url = new URL("http://example.com");
+
+// Se crea un objeto URLSearchParams vacio
+let params = new URLSearchParams();
+
+// Se añaden parametros de consulta al objeto URLSearchParams
+params.append("q", "term");
+params.append("opts", "exact");
+
+// Se convierte el objeto SearchParams a un string
+params.toString();
+
+// Se configura la propiedad seach del objeto URL con el valor
+// del objeto URLSearchParams luego de ser convertido string
+url.search = params;
+
+// Se consulta la url resultate
+// => "http://example.com/?q=term&opts=exact"
+url.href;
+```
+
+### Funciones de URL legacy
+
+Previo a lo expuesto anteriormente existieron métodos que intentaban manejar las URL. El primer intento fueron las funciones globalmente definidas `escape()` y `undescape()` las cuales estar actualmente deprecadas y no deben usarse.
+
+Cuando `escape()` y `unescape()` fueron deprecadas, ECMAScript introdujo dos pares de funciones alternativas:
+
+- `encodeURI()` y `decodeURI()`:
+  - `encodeURI()`. Toma un string como su argumento y retorna un nuevo string en el cual carácteres no ASCII junto con ciertos ASCII caracteres (como el espacio) son escapados. Los caracteres primero con convertidos a su codificación UTF-8, luego cada byte de esa codificación es reemplazado con una secucuencia de escape `%xx` donde `xx` son dos digitos hexadecimales.
+  - `decodeURI()`. Revierde el proceso de codificación. Debido a que `encodeURI()` no tiene usa separadoress como `/`, `?`  `#`.
+
+- `encodeURIComponent()` y `decodeURIComponent()`: Funcionan como `encondeURI()` y `decodeURI()` excepto que ellos estan destinados a escapar componentes individuales de una `URI`, así estos tambíen escapan caracteres como `/`, `?`, `#` que son usados para separar esos componentes.
+
+El problema fundamentar con estas funciones que ellas buscan aplicar un solo patrón de codificación para todas las partes de una `URL` cuando de hecho para diferentes partes de una `URL` se usan distintas codificaciones. Es recomendado formatear y codificar URLs usando la clase `URL`.
