@@ -593,10 +593,224 @@ Los caracteres de clase pueden usar un guión para indicar un rango, por ejemplo
 
 También se inluyen los carácteres especiales y las secuencias de escape. Por ejemplo `\s` coincide con el carácter de espacio, tab y cualquier otro caracter de espacio en blanco unicode; `\S` coincide con cualquier caracter que no sea un espacio en blanco unicode. Es posible además definir nuestras propieas clases de carácteres Unicode, por ejemplo: `/[\u0400-\u04FF]/`. El caracter `\b` tiene un significado especial. Cuando es usado dentro de caracteres de clase, este representa el caracter `backspace` o retorno de carro.
 
-_Caracteres de clase Unicode_  
-En ES2018, si una expresión resular usa la bandera `u`, entonces el caracter de clase \p{...} y su negación \P{...} son soportadas.
+Caracteres de clase de expresiones regulares
 
-El caracter de clase `\d` coincide solo con digitos ASCII. Si se desea coincidir con digitos decimales
+| Caracter    | Coincidencia    |
+|:-----------:|-----------------|
+| [...]       | Cualquier caracter entre los cochetes |
+| [^...]      | Cualquier caracter que no esté en los corchetes |
+| .           | Cualquier caracter excepto un caracter unicode de terminación de linea |
+| \w          | Cualquier caracter ASCII de palabras [a-zA-Z0-9_]  |
+| \W          | Cualquier caracter que non es ASCII world |
+| \s          | Cualquier espacio en blanco unicode |
+| \S          | Cualquier caracter no espacio en blanco unicode |
+| \d          | Digitos ASCII [0-9] |
+| \D          | Cualquier carácter distinto a digito ASCII [^0-9] |
+| [\b]        | Backspace literal
+
+_Caracteres de clase Unicode_  
+En ES2018, si una expresión resular usa la bandera `u`, entonces el caracter de clase `\p{...}` y su negación `\P{...}` son soportadas.
+
+El caracter de clase `\d` coincide solo con digitos ASCII. Si se desea coincidir con digitos decimales, se debe añadir `/\p{Decimaml_Number}/u`.
+
+Si se desea coincidir un caracter que no es un dígito decimal en cualquier lenguaje, se debe usar P mayuscula y escribir \P{Decimal_Number}. Si se desea coincidir con cualquier número como caracter, incluidad fracciones y números romanos, es posible usar \p{Number}.
+
+**Repeticion**  
+La repetición especifica cuantas veces un elemento de una expresión regular es repetido.
+
+Los carácterrs que especifican repetición siempre siguen el patrón para el cual están siendo aplicados. Debido a que ciertas repiticiones son comunmente usadas, hay caractereres especiales para representar algunos casos. Por ejemplo, `+` coincide con una o más ocurrencias del patrón previo.
+
+Resumen de los caracteres de repetición de expresiones regulares:
+
+|Caracter | Sgnificado |
+|:---------:|-----------|
+|{n,m}      | Coincide con el item previo al menos n veces no mas de m veces |
+|{n, }      | Coincide con el item previo n o más veces |
+|{n}        | Coincide exactamente con n ocurrencias del item precio |
+| ?         | Coincide cero o una ocurrencia.
+| +         | Coincide con una o más ocurrencias |
+| *         | Coincide con cero o más ocurrencias |
+
+Por ejemplo:
+
+```js
+// Coincide con entre 2 a 4 digitos
+let r = /\d{2, 4}/;
+
+// Coincide exactamente 3 carácteres de palabras y 1 digito 
+// opcional
+r = /\w{3}\d?/;
+
+// Uno o más espacios en blanco al principio, la palabra java y
+// uno o más espacios en blanco al final
+r = /\s+java\s+/;
+
+// Cero o más carácteres que no son apertura de parentesis
+r = /[^(]*/
+```
+
+Se debe tener cuidado con los carateres de repetición `*` y `?`. Estos puede coincidir con cero instacias, por lo que la expresión regular `/a*/` puede coincidir con el string "bbbb" ya que el string contiene cero ocurrencias de la letra a.
+
+**Non-greedy repetition**  
+Consiste en que las concidencias se hagan en los menores caracteres posibles. Seguido del caracter de repetición o carácteres simples se añade un signo de interrogación como: `??`, `+?`, `*?`, `{1, 5}`.
+
+Por ejemplo `/a+?/` puede coincidir con uno o más ocurrencias de la letra "a" en "aaa", pero el patrón solo concidirá con el menor número de ocurrencias posibles, en este caso solo con la primera letra "a".
+
+_Resultados inesperados_
+Algunas veces usar este tipo de patrones puede tener resultados inesperados. Por ejemplo, consideremos el string "aaab", al cual aplicamos el patrón `/a+?b/`. Se esperaría que se concida solo con una letra "a", seguida de una letra "b". Sin embargo, el resultado será el mismo string "aaab". Esto debido a que se elege la primera coincidencia, es decir la primera letra "a" y desde ahi se coincidera como el comienzo de las coincidencias, por lo que coincidencias más pequeñas que comiencen en los carácteres subsecuentes no son consideradas.
+
+**Alternación, agrupación y referencias**  
+La gramática de las expresiones regulares incluye caracteres especiales para especificar alternativas, subexpresiones y referirnos a subexpresiones previas.
+
+_Alternativas con |_  
+El caracter `|` separa alternativas, por ejemplo `/ab|cd|ef/` coincidirá con el string "ab", "cd" o "ef". Y `/\d{3}|[a-z]{4}/` coincidirá con 3 dígitos, o 4 letras minúsculas.
+
+Notar que las alternativas son consideraras de izquierda a derecha hasta que una coincidencia es encontrada. Si una alternativa a la izquierda es encontrada, entonces las alternativa a la derecha serán ignoradas.
+
+_Parentesis como agrupación_  
+Uno de los propósitos de los parentesis es separar items en un a sola subexpresión, aso esos items pueden ser tratados como una sola unidad. Por ejemplo: `/java(script)?/` coinciderá con "java"" seguido se una parte opcional "script". Y `/(ab|cd)+|ef/` coincidirá con o el string "ef" o una o más repeticiones de uno de los strings "ab" o "cd".
+
+_Parentesis para definir subpatrones_  
+Otro propósito de los parentésis es definir subpatrones dentro de un patrón mayor. Cuando unna expresión regular hace coincidencia exitosamente, es posible extraer porciones del string objetivo desde algún subpatrón que este en parentésis. Por ejemplo: supongamos que estamos buscando por una o más letras minúsculas seguidas por uno o más digitos. Podríamos usar el patrón `/[a-z]+\d+/`, pero supongamos que solo nos interesan los números al final del pratrón. Si agregamos usa parte de patrón entre parentésis `/[a-z]+(\d+)/` podremos estraer los digitos desde calquier coincidencia que se encuentre.
+
+_Parentesis para referencias subpatrones_
+Otro uso relacionado con los parentesis es permitir referencias subexpresiones en la misma expresión regular. Esto es hecho con un caráter `\` seguido de un digito. Los digitos se refieren a la posición de la subexpresión parametrizada en la expresión regular mayor. Por ejemplo, `\1` refiere a la primera subexpresión, `\2` a la segunda y así. Debido a que las subexpresiones pueden estar anidadas, es la posición del parentesis izquiedo la que es contada.
+
+Por ejemplo:
+
+```js
+// Se busca referencias a la siguiente subexpresión 
+// ([Ss]cript)
+let exp = /([Jj]ava([Ss]cript)?)\sis\s(fun\w*)/;
+```
+
+Al buscar la subexpresión `([Ss]cript)` se tiene que se encuentra en el segundo parentesis de apertura, por lo que nos podemos referie a ella con `\2`.
+
+Una referencia a una previa subexpresión de una expresión regular, no se refiere al patrón para esa subexpresión, sino más bien al texto que coincide con esa subexpresión. Así, las referencias pueden ser usadas para reforzar una restricción de porciones separadas del contenido de un string contengan exactamente los mismos caracteres.
+
+Por ejemplo. La siguiente expresión regular coincide con zero o más caracteres dentro de comillas simples o dobles. Sin embargo, esto no requiere que las comillas de apertura deban cerrarse con las correspondientes comillas de cierre para coincidir.
+
+```js
+// Coincide con las comillas simples o dobles que no sean 
+// seguidas por comillas simples o dobles en el mismo orden. 
+let exp = /['"][^'"]*['"]/
+```
+
+> En la expresión anterior se muestra que se espera comillas  simples o dobles `('")` luego cualquier caracter que no sean comillas simples o dobles que aparescan cero o más veces y al final nuevamente comillas simples o dobles, pero podrían aparecer en cualquier orden, por o que si en el primer grupo se abre una comilla simple, en el grupo final podria en lugar de colocarse otra comilla simple de cierre, colocarse una comilla doble. Esto concidiría correctamente.
+
+Para requerir que las comillas coincidas, se debe usar una referencia:
+
+```js
+let exp = /(['"])[^'"]*\1)/;
+```
+
+> En la expresión anterior decimos que primero esperamos que aparescan comillas simples o dobles, luego esperamos la aparición de cualquier caracter que no sean comillas simples o dobles cero o más veces, y al final con `\1` hacemos referencia a los caracteres de la primera subexpresión, por lo que si los caracteres que hacen match en la primera subexpresión son `"` debe aparecer en al final también `"`. Si los caracteres que hacen match en la primera expresión son `"'` al final debe repetirse lo mismo `"'`, por lo que esto obliga que las comillas sean cerradas.  
+
+No es legar usar una referencia dentro de un caracter de clase, por lo que no es posible usar algo como: `/(['"])[^\1]*\1/`.
+
+_Agrupación con parentesis y ?_  
+Es también posible agrupar items de una expresión regular sin crear referencias numeradas. En su lugar podemos agrupar items entre prentesis comenzando el grupo con `(?:` y terminandolo con `)`. Por ejemplo:.
+
+```js
+let exp = /([Jj]ava(?:[Ss]cript)?)\sis\s(fun\w*)/;
+```
+
+En el ejemplo anterior, la subexpresión `(?:[Ss]cript)` es usada simplemente para agrupar, asi el caracter de repetición puede ser aplicado al grupo. Esto no produce referencias, por lo que en este caso, `\2` se referirá a la expresión `(fun\w*)`.
+
+**Tabla de caracteres de agrupación, alternativas y referencias**  
+La siguiente tabla resume el uso de los carácteres.
+
+| Caracter    | Significado   |
+|:-----------:|:--------------|
+| \|          | Alternativa. Concide con alguna de las subexpresionene |
+| (...)       | Agrupación. Agrupa items en una sola unidad |
+| (?:...)     | Agrupar solo. Agrupa en una sola unidad |
+| \n          | Referencia. Coincide exactamente con los caracteres que coincidieron anteriormente |
+
+**Captura de grupos con nombre**  
+ES2018 estandariza esta característica. Nos permite asoociar un nombre con el cual cada parentesis de la izquierda en una expresión regular, de modo que podemos referirnos a la concidencia por un nombre.
+
+Para nombrar un grupo, se usa `(?<name>)` y se pone el nombre entre `<`y `>`. Por ejemplo:
+
+```js
+// Cada grupo de la expresión regular recibe un nombre
+let exp = /(?<city>\w+) (?<state>[A-Z]{2}) (?<zipcode\d{5}>) (?<zip9>-\d{4})?/;
+```
+
+Si se desea referenciar a un grupo de la expresión regular, se puede hacer a traves de su nombre, por ejemplo:
+
+```js
+let exp = /(?<quote>['"])[^'"]*\k<quote>/;
+```
+
+**Especificando la posición de coincidencias**  
+( A completar )
+
+**Flags**  
+Cada expresión regular puede tener una o más flags asociadas, las cuales alteran el comportamiento de la expresión regular. JavaScript define seis posibles `flags`, las cuales son representadas por una letra. Las `flags` son especificadas luego del segundo `/` caracter en una expresión regular literal o como un string pasado como segundo argumento al constructor `RegExp()`.
+
+Las banderas soportadas son:
+
+- `g`. Indica que la expresión regular es `global`, esto es que se usará para encontrar todas las coincidencias dentro del string en lugar de solo la primera.
+- `i`. Especifica que la coincidencia debe ser case-insensitive.
+- `m`. Especifica que la coincidencia debe ser hecha en modo multilinea, y que `^` y `$` deben coincidir con el comienzo y el final del string y también con el comienzo y el final de las líneas individuales.
+- `s`. Es también útil cuando se trabaja con texto que incluye nuevas líneas. Normalmente, un `.` en una expresión regular coincide con cualquier carácter excepto un terminador de línea. Cuandos se añade la bandera `s`, un `.` también considirá con carácteres de terminaciones de línea.
+- `u`. La bandera `u` soporta Unicode, y hace que las expresiones regulares coincidan totalmente con Unicode en lugar de valores de 16-bit. Se recomienda usarla en todas las expresiones regulares a menos de tener una razón para no hacerlo.
+- `y`. Indica que la expresión regular es `sticky` y debería considir al comienzo de un string o en el primer caracter seguido de la coincidencia previa.
+
+Estas banderas pueden ser usadas en cualquir combinación y orden.
+
+### Métodos de string para patrones de coincidencias
+
+Se cubrirá ahora la API papra usar objetos `RegExp`.
+
+**search()**  
+Toma una expresión como argumento y retorna la posición del primer caracter donde comienza la coincidencia o -1 si no hay coincidencia. Search no soporta búsquedas globales por lo que ignora la bandera `u`. Por ejemplo:
+
+```js
+// => 4. Se retorna 4 ya que la s aparece en la posición 4.
+let exp1 = "JavaScript".search(/script/ui)
+
+// => -1. Se retorna -1 ya que no hay coincidencia
+let exp2 = "Python".search(/script/ui)
+```
+
+**replace()**  
+Realiza la operación de buscar y reemplazar. Toma una expresión regular como su primer argumento y un string de reemplazo como segundo argumento. Si la expresión regular tiene la bandera `\g`, todas las coincidencias serán reemplazadas. Si el primer argumento es un string literal, se buscará ese string y se reemplazará. Por ejemplo:
+
+```js
+// Sin importar como están escritas las mayúasculas o minúsculas
+// Se reemplazará el texto por la correcta capitalización
+text.replace(/javascript/gi, "JavaScript");
+```
+
+`replace()` es mucho más poderoso que lo anterior. Redordemos que las subexpresiones parametrizadas de una expresión regular sin numeradas de izquierda a derecha y que estos recuerdan el texto que con el cual coincide cada subexpresión. Si un `$` seguido de un dígito aparece en la cadena de reemplazo, `replace()` reemplaza esos dos caracteres por el texto que coincide con la subexpresión especificada.
+
+Por ejemplo, para reemplazar las comillas en un string con otros caracteres:
+
+```js
+// Se busca una comilla que puede ser seguida por cualquier 
+// número de caracteres que no sean comillas, los cuales 
+// son capturados en los parentesis parametrizandolos, seguidos
+// de otra comilla.
+let quote = /"([^"]*)"/g;
+
+// Se reemplazan las comillas. $1 almacena la subexpresión
+// ([^"]*), la cual se recuerda de manera literal y reemplazara
+// a $1, luego las comillas " y " serán reemplazadas por <<
+// y >>
+'He said "stop"'.replace(quote, '<<$1>>');
+```
+
+Si la expresión regular usa nombres para capturar grupos, entonces es posible referise al texto que coincide por este nombre:
+
+```js
+let quote = /"(?<quotedText>[^"]*)"/g;
+
+// El resultado de aplicar lo siquiente será:
+// => 'He said -stop-'
+'He said "stop"'.replace(quote, '-$<quotedText>-');
+```
 
 ## Fechas y horas
 
