@@ -812,6 +812,98 @@ let quote = /"(?<quotedText>[^"]*)"/g;
 'He said "stop"'.replace(quote, '-$<quotedText>-');
 ```
 
+Es posible pasar una función como segundo argumento a `replace()`, la que será invocada para calcular el valor de reemplazo. Esta es invocoada con varios argumentos:
+
+- El texto
+- Los substrings que fueron capturados en subgrupos, si los hay
+- La posición del string donde la coincidencia se encontró
+- El string completo donde sobre el cual se llamó la funcion
+- Un objeto cuyas propiedades son los subgrupos con nombres capturados. Los nombres de las propiedades son los nombres de los subgrupos y los valores de las propiedades son el texto coincidente del subgrupo.
+
+Por ejemplo, una función para convertir de enteros decimales a hexadecimal.
+
+```js
+let s = "15 times 15 is 225";
+s.replace(/\d+/gu, n => parseInt(n).toString(16));
+```
+
+**match()**  
+Toma una expresión regular como su único argumento y retorna un array que contiene los resultados de las coincidencias, o `null` si no hay coincidencias. Si se agrega la bandera `g`, se retorna un array con todas las coincidencias que aparecen en el string.
+
+```js
+// => ["7", "8", "15"]
+"7 plus 8 igual 15".match(/\d+/g);
+```
+
+Sin la bandera `g` el primer elemento retornado dentro del array resultanto sera el string que coincide, y los elementos restantes, los subsestrings parametrizados.
+
+Por ejemlo:
+
+```js
+let url = /(\w+):\/\/([\w.]+)\/(\S*)/;
+let text = "Visit my blog at http://www.example.com/~david";
+let match = text.match(url);
+let fullurl, protocol, host, path;
+if (math !== null) {
+  //=> "http://www.example.com/~david
+  fullurl = match[0];
+  
+  // => "http"
+  protocol = match[1];
+  
+  // => "www.example.com"
+  host = match[2];
+  
+  // => "~david"
+  path = match[3];
+}
+```
+
+El array retornado por `match()` también tiene algunas propiedades objetos además de los elementos numerados. La propiedad `input` se refiere al string en el cual `match()` fue llamada, la propiedad `index` es la posición dentro del estring en la cual la coincidencia comienza. Si una expresión regular contiene grupos nombrados, entonces el array retornado también contiene una propiedad llamada `groups` cuyo valor es un objeto.
+
+Un ejemplo con subgrupos nombrados:
+
+```js
+let url = /(?<protocol>\w+):\/\/(?<host>[\w.]+)\/(?<path>\S*)/;
+let text = "Visit my blog at http://www.example.com/~david";
+let match = text.match(url);
+
+// => "http://www.example.com/~david"
+match[0]
+
+//=> text
+match.input
+
+// => 17
+match.index
+
+// => "http"
+match.groups.protocol
+
+// => "www.example.com"
+match.groups.host
+
+// => "~david"
+match.groups.path
+```
+
+=> Completar
+
+**matchAll()**  
+Espera una `RegExp` con la bandera `g` configurada. Retorna un iterador que entrega el tipo de objetos que `match()` retorna cuando es usado con una expresión regular no global.
+
+Es posible usar `matchAll()` para iterar a traves de las palabras en el string de texto. Por ejemplo:
+
+```js
+const words = /\b\p{Alphabetic}+\b/gu;
+const text = "this is a naive test of matchAll() method.";
+for (let word of text.matchAll(words)) {
+  console.log(`Found '${word[0]}' at index ${word.index}.`);
+}
+```
+
+Es posible configurar la propiedad `lastIndex` de un objeto `RegExp` para decirle a `matchAll()` cual índice en el string comanza las coincidencias. Diferente a otros métodos, `matchAll()` nunca modifica la propiedad `lastIndex()` de la expresión regular donde se es llamado.
+
 ## Fechas y horas
 
 La clase `Date` es una `API` de JavaScript que trabaja con fechas y horas. Se puede crear un objeto `Date` mediante su constructor `Date()`. Sin argumentos, este retorna un objeto `Date` que representa la fecha y hora actual. Si se pasa un argumento con valor numérico, el constructor `Date()` interpreta ese valor como el número de milisegundos trascurridos desde el 1 de enero de 1970.
