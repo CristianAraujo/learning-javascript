@@ -93,11 +93,12 @@ class Point {
 
     distance() {
         return Math.sqrt(
-            this.x * this.x + this.y * this.y;
+            this.x * this.x + this.y * this.y
         );
     }
 }
 
 let p = new Point(1, 1);
-p.distance();
+let result = p.distance();
+console.log(result);
 ```
